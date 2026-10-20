@@ -40,8 +40,8 @@ function usdOf(obj){return toUSD(number(obj.amountMinor),obj.currency||'USD');}
 function formatMoney(usd,currency=state.settings.currency){const val=toView(number(usd),currency);return (currency==='KHR'?'៛':'$')+new Intl.NumberFormat('en-US',{maximumFractionDigits:currency==='KHR'?0:2,minimumFractionDigits:currency==='KHR'?0:2}).format(val);}
 function formatOriginal(obj){return formatMoney(usdOf(obj),obj.currency||'USD');}
 function amountField(obj={}){return obj.amountMinor===undefined?'':String(obj.amountMinor/(obj.currency==='KHR'?1:100));}
-function fmtDate(s){if(!s)return'—';const [y,m,d]=s.split('-').map(Number);const date=new Date(y,m-1,d);return date.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});}
-function monthLabel(s=monthNow()){const [y,m]=s.split('-').map(Number);return new Date(y,m-1,1).toLocaleDateString('en-US',{month:'long',year:'numeric'});}
+function fmtDate(s){if(!s)return'—';const [y,m,d]=s.split('-').map(Number);const date=new Date(y,m-1,d);return date.toLocaleDateString(state.settings.language==='km'?'km-KH':'en-US',{month:'short',day:'numeric',year:'numeric'});}
+function monthLabel(s=monthNow()){const [y,m]=s.split('-').map(Number);return new Date(y,m-1,1).toLocaleDateString(state.settings.language==='km'?'km-KH':'en-US',{month:'long',year:'numeric'});}
 const isIn=(date,range)=>date>=range.from&&date<=range.to;
 const category=id=>state.categories.find(c=>c.id===id)||{name:'Uncategorized',color:COLORS[7],emoji:'📦',type:'expense'};
 const categoryName=id=>category(id).name;
@@ -77,6 +77,8 @@ function updateLanguageUI(){
   button.setAttribute('lang',lang==='km'?'en':'km');
  }
  window.PocketwiseI18n?.setLanguage(lang);
+ const label=pages.find(p=>p[0]===page)?.[1]||'Dashboard';
+ document.title=`${window.PocketwiseI18n?.translateString(label)||label} • ${state.settings.name}`;
 }
 function render(){renderNav();theme();document.querySelectorAll('.brand-name').forEach(el=>el.textContent=state.settings.name);document.title=`${pages.find(p=>p[0]===page)?.[1]||'Dashboard'} • ${state.settings.name}`;$('today-chip').textContent=fmtDate(today());const main=$('main');({dashboard:renderDashboard,transactions:renderTransactions,budgets:renderBudgets,analytics:renderAnalytics,savings:renderSavings,templates:renderTemplates,reports:renderReports,settings:renderSettings}[page]||renderDashboard)();updateLanguageUI();}
 function navigate(id){if(!pages.some(p=>p[0]===id))return;if($('modal-root')?.innerHTML)closeModal();page=id;render();scrollTo({top:0,behavior:'instant'});}
@@ -436,7 +438,7 @@ function renderReports(){
  ${[['reportSummary','Summary figures'],['reportCharts','Spending breakdown'],...(purchases?[]:[['reportTable','Transaction table']]),['reportNotes','Footer notes']].map(([key,label])=>`<label class="switch-line"><input type="checkbox" data-setting="${key}" ${state.settings[key]?'checked':''}> ${label}</label>`).join('')}
  ${purchases?'<p class="small muted">The full itemized list is always included in purchases PDFs, even if other report options are disabled.</p>':''}
  <div class="divider"></div><div class="export-strip"><button class="btn btn-primary" data-action="exportPDF">${icon('download')} PDF</button><button class="btn" data-action="exportCSV">CSV</button><button class="btn" data-action="exportXLSX">Excel .xlsx</button></div>
- <p class="small muted">Saved-data check: ${esc(savedExpenseNote)}. If a September purchase is missing, check Transactions → All time.</p><button type="button" class="btn btn-soft btn-sm" data-action="showAllSavedExpenses">${icon('transactions')} View all saved expense entries</button><p class="small muted">PDFs download offline. For Khmer letters, use “Print / Save as PDF” with a Khmer-capable browser font.</p>
+ <p class="small muted">Saved-data check: ${esc(savedExpenseNote)}. If a September purchase is missing, check Transactions → All time.</p><button type="button" class="btn btn-soft btn-sm" data-action="showAllSavedExpenses">${icon('transactions')} View all saved expense entries</button><p class="small muted">The PDF download uses a Latin-only font. For Khmer text, choose “Print / Save as PDF” instead so your device can use a Khmer-capable font.</p>
  </div></section><section class="panel"><div class="panel-head"><div><h2>Live report preview</h2><p>${p.tx.length} entries to export · ${esc(p.cur)}</p></div></div>${preview}</section></div>`;
 }
 function spentFromTx(tx){const map=new Map();for(const t of tx){if(t.type==='expense')map.set(t.categoryId,(map.get(t.categoryId)||0)+usdOf(t));}return [...map].map(([id,amount])=>({id,amount})).sort((a,b)=>b.amount-a.amount);}
@@ -622,7 +624,7 @@ async function clickAction(action,id){switch(action){
  case 'applyReportDates':applyReportDates(true);break;
  case 'showAllSavedExpenses':filters.period='all';filters.type='expense';filters.category='all';filters.method='all';filters.search='';navigate('transactions');break;
  case 'allPurchasesPDF':pdfExport(allPurchaseReportPayload());break;
- case 'printReport':if(applyReportDates(false)){if(page==='reports')renderReports();window.print();}break;
+ case 'printReport':if(applyReportDates(false)){if(page==='reports')renderReports();window.PocketwiseI18n?.apply(document.body);window.print();}break;
  case 'analyticsReport':report.period=analyticPeriod;if(analyticPeriod==='custom'){report.from=analyticsFrom;report.to=analyticsTo;}page='reports';render();break;
  case 'saveSettings':{const name=document.querySelector('[name="setting-name"]')?.value.trim();const rate=number(document.querySelector('[name="setting-rate"]')?.value,0);if(!name||rate<=0){toast('Enter a valid name and positive exchange rate.',true);break;}state.settings.name=name.slice(0,45);state.settings.currency=$('setting-currency').value;state.settings.rate=rate;state.settings.theme=$('setting-theme').value;state.settings.accent=$('setting-accent').value;save();render();toast('Settings saved');break;}
  case 'saveLabels':{for(const k of Object.keys(state.settings.labels)){const value=document.querySelector(`[name="label-${k}"]`)?.value.trim();if(value)state.settings.labels[k]=value.slice(0,35);}save();render();toast('Dashboard labels saved');break;}
