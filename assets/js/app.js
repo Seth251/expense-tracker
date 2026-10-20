@@ -356,7 +356,10 @@ function reportRange(){
 }
 function applyReportDates(renderPreview=true){
  if(page!=='reports'||report.period!=='custom')return true;
- const from=$('report-from')?.value||'',to=$('report-to')?.value||'';
+ // Date inputs use name attributes; query by name so all browsers find them.
+ const fromInput=$('report-from')||document.querySelector('input[name="report-from"]');
+ const toInput=$('report-to')||document.querySelector('input[name="report-to"]');
+ const from=String(fromInput?.value||'').trim(),to=String(toInput?.value||'').trim();
  if(!validISODate(from)||!validISODate(to)){
   toast('Select both valid report dates before downloading.',true);
   return false;
@@ -428,7 +431,7 @@ function renderReports(){
  ${field('Report content',`<select class="control" id="report-mode"><option value="purchases" ${purchases?'selected':''}>All purchases & expenses (itemized)</option><option value="finance" ${mode==='finance'?'selected':''}>Income & expense report</option><option value="budget" ${mode==='budget'?'selected':''}>Budget performance</option><option value="savings" ${mode==='savings'?'selected':''}>Savings goals</option></select>`)}
  ${field('Report title',txtInput('report-title',state.settings.reportTitle,'All Purchases & Expenses Report'))}
  ${field('Reporting period',`<select class="control" id="report-period"><option value="all" ${report.period==='all'?'selected':''}>All time (every purchase)</option><option value="today" ${report.period==='today'?'selected':''}>Today</option><option value="week" ${report.period==='week'?'selected':''}>This week</option><option value="month" ${report.period==='month'?'selected':''}>This month</option><option value="lastmonth" ${report.period==='lastmonth'?'selected':''}>Last month</option><option value="year" ${report.period==='year'?'selected':''}>This year</option><option value="custom" ${report.period==='custom'?'selected':''}>Custom range</option></select>`)}
- ${report.period==='custom'?`<div class="fields-grid">${field('From — first purchase date included',txtInput('report-from',report.from||reportInitialFrom(),'',true,'date'))}${field('To — last purchase date included',txtInput('report-to',report.to||today(),'',true,'date'))}</div><button type="button" class="btn btn-primary btn-sm" data-action="applyReportDates">${icon('check')} Apply date range</button><p class="small muted" id="report-custom-status" style="margin:8px 0 0">Both dates are included. After picking the dates, tap Apply date range to refresh the preview and download exactly that period.</p>`:''}
+ ${report.period==='custom'?`<div class="fields-grid">${field('From — first purchase date included',txtInput('report-from',report.from||reportInitialFrom(),'',true,'date','id="report-from"'))}${field('To — last purchase date included',txtInput('report-to',report.to||today(),'',true,'date','id="report-to"'))}</div><button type="button" class="btn btn-primary btn-sm" data-action="applyReportDates">${icon('check')} Apply date range</button><p class="small muted" id="report-custom-status" style="margin:8px 0 0">Both dates are included. After picking the dates, tap Apply date range to refresh the preview and download exactly that period.</p>`:''}
  ${!purchases?field('Transaction type',`<select class="control" id="report-type"><option value="all" ${report.type==='all'?'selected':''}>All transactions</option><option value="expense" ${report.type==='expense'?'selected':''}>Expenses only</option><option value="income" ${report.type==='income'?'selected':''}>Income only</option></select>`):'<p class="small muted">This report includes every recorded expense, not income or savings transfers. A budget date is not the same as a purchase date.</p>'}
  ${field('Category',`<select class="control" id="report-category">${catOptions('all',report.category,true)}</select>`)}
  ${field('First balance from budget',`<select class="control" id="report-budget"><option value="auto" ${report.budgetId==='auto'?'selected':''}>${state.budgets.length?'Primary budget (automatic)':'No budgets saved yet'}</option>${state.budgets.map(b=>`<option value="${esc(b.id)}" ${report.budgetId===b.id?'selected':''}>${esc(b.name)} · ${esc(formatOriginal(b))}${b.startDate?' · '+esc(fmtDate(b.startDate)):''}</option>`).join('')}</select>`)}
@@ -682,7 +685,7 @@ function handleChange(e){const target=e.target,id=target.id;
  if(id==='analytics-from'){analyticsFrom=target.value;renderAnalytics();return;}
  if(id==='analytics-to'){analyticsTo=target.value;renderAnalytics();return;}
  if(id==='report-title'){state.settings.reportTitle=target.value.slice(0,70)||'Financial Report';save();renderReports();return;}
- if(id==='report-from'||id==='report-to'){
+ if(id==='report-from'||id==='report-to'||target.name==='report-from'||target.name==='report-to'){
   // Never replace a native iOS date picker while the user is entering a date.
   // Keep both inputs intact until the explicit Apply date range action.
   const status=$('report-custom-status');
