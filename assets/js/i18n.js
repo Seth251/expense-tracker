@@ -444,7 +444,9 @@
   "Quick add expense": "បញ្ចូលចំណាយរហ័ស",
   "Open Reports": "បើករបាយការណ៍",
   "Income and expenses": "ចំណូល និងចំណាយ",
-  "Available to spend": "ប្រាក់អាចចំណាយបាន"
+  "Available to spend": "ប្រាក់អាចចំណាយបាន",
+  "The PDF download uses a Latin-only font. For Khmer text, choose “Print / Save as PDF” instead so your device can use a Khmer-capable font.": "ការទាញយក PDF ធម្មតាប្រើពុម្ពអក្សរឡាតាំងតែប៉ុណ្ណោះ។ ប្រសិនបើចង់បង្ហាញអក្សរខ្មែរ សូមជ្រើស «បោះពុម្ព / រក្សាទុកជា PDF» ដើម្បីប្រើពុម្ពអក្សរខ្មែរពីឧបករណ៍។",
+  "Change the display language without changing your saved financial data.": "ប្តូរភាសាបង្ហាញដោយមិនប៉ះពាល់ដល់ទិន្នន័យហិរញ្ញវត្ថុដែលបានរក្សាទុក។"
 };
   const originalText = new WeakMap();
   const appliedText = new WeakMap();
