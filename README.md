@@ -139,3 +139,12 @@ The **Reports** page now shows **First Balance**, **Expenses in Report**, and **
 **First Balance** = amount entered for that saved budget. **Expenses in Report** = expenses included by the currently selected reporting period and category filters (for example Sep 14 through Oct 21, inclusive). **Remaining Balance** = First Balance − Expenses in Report. For the unfiltered **All purchases PDF**, expenses cover all saved purchase dates. Income is not added twice. If no budget exists, First Balance and Remaining Balance are shown as unavailable, instead of assuming zero. A budget's money-received/start date is displayed for reference and is not an expense filter.
 
 Examples: First Balance USD 500; itemized expenses USD 125; Remaining Balance USD 375. These values are converted into the preferred report currency, with original purchase currencies retained in the item list.
+
+
+## English / Khmer bilingual support (ភាសាខ្មែរ)
+
+Pocketwise now supports **English** and **Khmer (ខ្មែរ)**. The small **ខ្មែរ / EN** button in the top header switches languages immediately. You can also open **Settings → Language / ភាសា**. Your language choice is saved in the app and survives page reloads.
+
+Navigation, dashboards, transactions, purchased-item forms, budgets, savings, templates, reports, and settings have Khmer translations. Both languages use the same financial records, and switching language does not change amounts, budget dates, exchange rates, or your saved transactions. The Khmer localization pack is cached for offline use after the PWA updates. Khmer month and date display is localized while ISO dates stored internally stay unchanged.
+
+**Khmer PDF important:** the existing dependency-free PDF download engine uses Latin-only Helvetica; it cannot properly embed Khmer characters. When you need a report with Khmer text, open **Reports** while using Khmer and choose **Print / Save as PDF**. Your mobile browser’s print/save flow uses installed system Khmer fonts (depending on browser/device). The ordinary direct **Download PDF** option remains available, but its text rendering is Latin-only. No third-party font binaries are shared or hosted by this project.
