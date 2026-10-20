@@ -201,7 +201,7 @@
   if(!data.items?.length)paragraph('មិនមានប្រតិបត្តិការក្នុងរយៈពេលដែលបានជ្រើសទេ។');
   else data.items.forEach(drawItem);
   reserve(65);stroke(y+3);y+=22;
-  paragraph('ចំណាយសរុប៖ '+(data.expenses||'0'),{bold:true,size:12,color:'#11734f'});
+  paragraph('ចំណាយសរុបក្នុងបញ្ជី៖ '+(data.itemListTotal||data.expenses||'0'),{bold:true,size:12,color:'#11734f'});
   finish();
   return pdfFromJpegs(imagePages,W,H);
  }
