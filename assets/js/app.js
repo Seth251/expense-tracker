@@ -471,9 +471,15 @@ function pdfNum(n){return (Math.round(n*100)/100).toString();}
 function pdfDate(s){if(!s)return'—';const [y,m,d]=s.split('-').map(Number);return new Date(y,m-1,d).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});}
 /* Khmer PDF downloads use browser-rendered Khmer glyphs rather than legacy Helvetica. */
 async function downloadReportPDF(overridePayload=null){
- if(state.settings.language!=='km'){pdfExport(overridePayload);return;}
+ const payload=overridePayload||reportPayload(),mode=payload.mode||report.mode||'purchases';
+ const containsKhmer=/[\u1780-\u17ff\u19e0-\u19ff]/;
+ const hasKhmerEntries=payload.tx.some(t=>[t.description,t.notes,t.method,...(t.tags||[]),categoryName(t.categoryId)].some(v=>containsKhmer.test(String(v||''))))||
+   state.budgets.some(b=>containsKhmer.test(b.name||''))||
+   containsKhmer.test(payload.title||'');
+ // Also use the Khmer-capable renderer for Khmer purchases entered while the UI is in English.
+ if(state.settings.language!=='km'&&!hasKhmerEntries){pdfExport(overridePayload);return;}
  if(!window.PocketwiseKhmerPDF?.download)throw Error('Khmer PDF support has not loaded. Reopen or refresh Pocketwise.');
- const payload=overridePayload||reportPayload(),balance=reportBalances(payload),mode=payload.mode||report.mode||'purchases';
+ const balance=reportBalances(payload);
  const translate=value=>window.PocketwiseI18n?.translateString(String(value||''),'km')||String(value||'');
  const allExpenses=(mode==='budget'||mode==='savings')?allPurchaseReportPayload().tx:payload.tx;
  const data={
