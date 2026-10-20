@@ -388,10 +388,68 @@
   "Language": "ភាសា",
   "Language / ភាសា": "ភាសា / Language",
   "English": "English",
-  "ខ្មែរ": "ខ្មែរ"
+  "ខ្មែរ": "ខ្មែរ",
+  "● Expenses": "● ចំណាយ",
+  "● Income": "● ចំណូល",
+  "Actions": "សកម្មភាព",
+  "All pages": "ទំព័រទាំងអស់",
+  "Amount (for quick add / budget)": "ចំនួនទឹកប្រាក់ (សម្រាប់បញ្ចូលរហ័ស / ថវិកា)",
+  "By category": "តាមប្រភេទ",
+  "Color": "ពណ៌",
+  "Emoji icon": "រូបតំណាង",
+  "Make this a recurring transaction": "កំណត់ជាប្រតិបត្តិការកើតឡើងវិញ",
+  "Move records to": "ផ្ទេរកំណត់ត្រាទៅ",
+  "PDFs download offline. For Khmer letters, use “Print / Save as PDF” with a Khmer-capable browser font.": "PDF អាចទាញយកដោយគ្មានអ៊ីនធឺណិត។ ដើម្បីរក្សាអក្សរខ្មែរក្នុង PDF សូមប្រើ «បោះពុម្ព / រក្សាទុកជា PDF» ជំនួសប៊ូតុងទាញយក PDF ធម្មតា។",
+  "Period": "រយៈពេល",
+  "Period expenses": "ចំណាយតាមរយៈពេល",
+  "Period income": "ចំណូលតាមរយៈពេល",
+  "Preview shows the first 150 entries. The PDF includes every matching item, including notes and tags.": "ការមើលជាមុនបង្ហាញតែ ១៥០ ប្រតិបត្តិការដំបូង។ PDF នឹងរួមបញ្ចូលទិន្នន័យទាំងអស់ រួមទាំងកំណត់ចំណាំ និងស្លាក។",
+  "Reassign and delete category": "ផ្ទេរទិន្នន័យហើយលុបប្រភេទ",
+  "Repeat every": "ធ្វើម្តងទៀតរៀងរាល់",
+  "Star a transaction template to add it here.": "ដាក់គំរូប្រតិបត្តិការជាចំណូលចិត្តដើម្បីបង្ហាញនៅទីនេះ។",
+  "Stay ahead of your spending": "គ្រប់គ្រងចំណាយឱ្យមានប្រសិទ្ធភាព",
+  "Total spent": "ចំណាយសរុប",
+  "Transaction category (optional)": "ប្រភេទប្រតិបត្តិការ (បើមាន)",
+  "Try refreshing the page. If this persists, open the browser console for details.": "សូមព្យាយាមផ្ទុកទំព័រឡើងវិញ។ ប្រសិនបើបញ្ហានៅតែមាន សូមពិនិត្យការកត់ត្រាកំហុស។",
+  "Unable to start Pocketwise": "មិនអាចបើក Pocketwise បានទេ",
+  "Add a budget to calculate your first and remaining balances. No starting amount is assumed.": "សូមបញ្ចូលថវិកាដើម្បីគណនាសមតុល្យដើម និងសមតុល្យនៅសល់។ កម្មវិធីមិនសន្មតចំនួនប្រាក់ដើមទេ។",
+  "1 item": "ទំនិញ ១ មុខ",
+  "1 item slot · 0 filled": "១ ប្រអប់ទំនិញ · បានបញ្ចូល ០",
+  "No recurring schedules": "មិនទាន់មានប្រតិបត្តិការកើតឡើងវិញ",
+  "No budgets yet": "មិនទាន់មានថវិកា",
+  "No goals": "មិនមានគោលដៅ",
+  "No transactions": "មិនទាន់មានប្រតិបត្តិការ",
+  "No goals yet": "មិនទាន់មានគោលដៅ",
+  "No templates yet": "មិនទាន់មានគំរូ",
+  "No categories yet": "មិនទាន់មានប្រភេទ",
+  "Manage": "គ្រប់គ្រង",
+  "Details": "លម្អិត",
+  "View all": "មើលទាំងអស់",
+  "My money": "ប្រាក់របស់ខ្ញុំ",
+  "Payment:": "ការទូទាត់៖",
+  "Category:": "ប្រភេទ៖",
+  "Notes:": "កំណត់ចំណាំ៖",
+  "Tags:": "ស្លាក៖",
+  "Show": "បង្ហាញ",
+  "Hide": "លាក់",
+  "Edit schedule": "កែសម្រួលកាលវិភាគ",
+  "Delete schedule": "លុបកាលវិភាគ",
+  "Budget date": "កាលបរិច្ឆេទថវិកា",
+  "Current balance": "សមតុល្យបច្ចុប្បន្ន",
+  "Revenue": "ចំណូល",
+  "Transactions (": "ប្រតិបត្តិការ (",
+  "Report generated": "បានបង្កើតរបាយការណ៍",
+  "Spending": "ចំណាយ",
+  "Total": "សរុប",
+  "Quick add expense": "បញ្ចូលចំណាយរហ័ស",
+  "Open Reports": "បើករបាយការណ៍",
+  "Income and expenses": "ចំណូល និងចំណាយ",
+  "Available to spend": "ប្រាក់អាចចំណាយបាន"
 };
   const originalText = new WeakMap();
+  const appliedText = new WeakMap();
   const originalAttributes = new WeakMap();
+  const appliedAttributes = new WeakMap();
   let active = 'en', observer = null, scheduled = false;
 
   function translateString(input, language) {
@@ -452,9 +510,14 @@
       if (!el.hasAttribute || !el.hasAttribute(attr)) continue;
       let dict = originalAttributes.get(el);
       if (!dict) { dict = {}; originalAttributes.set(el, dict); }
-      if (!(attr in dict)) dict[attr] = el.getAttribute(attr);
+      let last = appliedAttributes.get(el);
+      if (!last) { last = {}; appliedAttributes.set(el, last); }
+      // Preserve changes to button descriptions made by the app after initial rendering.
+      const current = el.getAttribute(attr);
+      if (!(attr in dict) || (attr in last && current !== last[attr])) dict[attr] = current;
       const output = translateString(dict[attr], lang);
-      if (el.getAttribute(attr) !== output) el.setAttribute(attr, output);
+      if (current !== output) el.setAttribute(attr, output);
+      last[attr] = output;
     }
   }
   function apply(root, lang = active) {
@@ -464,10 +527,14 @@
     let node, iterations = 0;
     while ((node = walker.nextNode())) {
       if (skipNode(node)) continue;
-      if (!originalText.has(node)) originalText.set(node,node.nodeValue);
-      const base=originalText.get(node);
-      const desired=translateString(base, lang);
+      // Text nodes are often reused for changing totals, item counts and other live values.
+      // Capture the newly rendered English source rather than restoring stale original text.
+      if (!originalText.has(node) || (appliedText.has(node) && node.nodeValue !== appliedText.get(node))) {
+        originalText.set(node,node.nodeValue);
+      }
+      const desired=translateString(originalText.get(node), lang);
       if (desired !== node.nodeValue) node.nodeValue = desired;
+      appliedText.set(node,desired);
       if (++iterations > 25000) break;
     }
     if (root.nodeType === 1) translateElement(root, lang);
