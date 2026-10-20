@@ -469,6 +469,35 @@ function pdfAscii(s){return String(s??'').normalize('NFKD').replace(/\u20ac/g,'E
 function pdfQuote(s){return pdfAscii(s).replace(/\\/g,'\\\\').replace(/\(/g,'\\(').replace(/\)/g,'\\)');}
 function pdfNum(n){return (Math.round(n*100)/100).toString();}
 function pdfDate(s){if(!s)return'—';const [y,m,d]=s.split('-').map(Number);return new Date(y,m-1,d).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});}
+/* Khmer PDF downloads use browser-rendered Khmer glyphs rather than legacy Helvetica. */
+async function downloadReportPDF(overridePayload=null){
+ if(state.settings.language!=='km'){pdfExport(overridePayload);return;}
+ if(!window.PocketwiseKhmerPDF?.download)throw Error('Khmer PDF support has not loaded. Reopen or refresh Pocketwise.');
+ const payload=overridePayload||reportPayload(),balance=reportBalances(payload),mode=payload.mode||report.mode||'purchases';
+ const translate=value=>window.PocketwiseI18n?.translateString(String(value||''),'km')||String(value||'');
+ const allExpenses=(mode==='budget'||mode==='savings')?allPurchaseReportPayload().tx:payload.tx;
+ const data={
+  title:translate(payload.title),
+  brand:state.settings.name,
+  mode,landscape:!!state.settings.reportLandscape,
+  currency:payload.cur,
+  range:payload.rangeLabel?translate(payload.rangeLabel):reportPeriodLabel(payload.range),
+  firstBalance:balance.first==null?'':formatMoney(balance.first,payload.cur),
+  expenses:formatMoney(expensesOf(allExpenses),payload.cur),
+  remainingBalance:balance.first==null?'':formatMoney(balance.first-expensesOf(allExpenses),payload.cur),
+  income:payload.income>0?formatMoney(payload.income,payload.cur):'',
+  budgetName:balance.budget?.name||'',
+  budgetDate:balance.budget?.startDate?fmtDate(balance.budget.startDate):'',
+  includeCategories:(mode==='finance'||mode==='purchases')&&state.settings.reportCharts,
+  categories:spentFromTx(allExpenses).map(c=>({name:translate(categoryName(c.id)),total:formatMoney(c.amount,payload.cur)})),
+  budgets:state.budgets.map(b=>{const u=budgetUsage(b);return {name:b.name,spent:formatMoney(u.spent,payload.cur),limit:formatMoney(u.limit,payload.cur),remaining:formatMoney(u.remaining,payload.cur)};}),
+  goals:state.goals.map(g=>({name:g.name,saved:formatMoney(goalsSaved(g.id),payload.cur),target:formatMoney(toUSD(g.targetMinor,g.currency),payload.cur)})),
+  items:allExpenses.map(t=>({date:fmtDate(t.date),name:t.description||'',type:t.type,category:translate(categoryName(t.categoryId)),method:translate(t.method||''),price:(t.type==='expense'?'-':'+')+formatOriginal(t),notes:t.notes||'',tags:(t.tags||[]).join(', ')}))
+ };
+ const file=await window.PocketwiseKhmerPDF.download(data);
+ downloadBlob(file,(overridePayload?'Pocketwise_All_Purchases_':'Pocketwise_Report_')+today()+'_KM.pdf');
+}
+
 function pdfExport(overridePayload=null){const payload=overridePayload||reportPayload(),mode=payload.mode||report.mode||'finance',land=!!state.settings.reportLandscape,W=land?842:595,H=land?595:842,pad=38,bottom=47;const pagesData=[];let ops=[],y=H-40;const makePage=()=>{if(ops.length)pagesData.push(ops.join('\n'));ops=[];y=H-48;ops.push(`0.05 0.58 0.42 rg 0 ${H-11} ${W} 11 re f`);};
  const text=(value,x,pos,size=10,bold=false,color='#243548')=>{const rgb=hexToRgb(color);ops.push(`${pdfNum(rgb[0])} ${pdfNum(rgb[1])} ${pdfNum(rgb[2])} rg BT /${bold?'F2':'F1'} ${size} Tf 1 0 0 1 ${pdfNum(x)} ${pdfNum(pos)} Tm (${pdfQuote(value)}) Tj ET`);};
  const box=(x,pos,w,h,color)=>{const c=hexToRgb(color);ops.push(`${c.map(pdfNum).join(' ')} rg ${pdfNum(x)} ${pdfNum(pos)} ${pdfNum(w)} ${pdfNum(h)} re f`);};
@@ -621,10 +650,10 @@ async function clickAction(action,id){switch(action){
  case 'exportJSON':exportJSON();break;
  case 'exportCSV':if(applyReportDates(false))exportCSV();break;
  case 'exportXLSX':if(applyReportDates(false))exportXLSX();break;
- case 'exportPDF':if(applyReportDates(false))pdfExport();break;
+ case 'exportPDF':if(applyReportDates(false))await downloadReportPDF();break;
  case 'applyReportDates':applyReportDates(true);break;
  case 'showAllSavedExpenses':filters.period='all';filters.type='expense';filters.category='all';filters.method='all';filters.search='';navigate('transactions');break;
- case 'allPurchasesPDF':pdfExport(allPurchaseReportPayload());break;
+ case 'allPurchasesPDF':await downloadReportPDF(allPurchaseReportPayload());break;
  case 'printReport':if(applyReportDates(false)){if(page==='reports')renderReports();window.PocketwiseI18n?.apply(document.body);window.print();}break;
  case 'analyticsReport':report.period=analyticPeriod;if(analyticPeriod==='custom'){report.from=analyticsFrom;report.to=analyticsTo;}page='reports';render();break;
  case 'saveSettings':{const name=document.querySelector('[name="setting-name"]')?.value.trim();const rate=number(document.querySelector('[name="setting-rate"]')?.value,0);if(!name||rate<=0){toast('Enter a valid name and positive exchange rate.',true);break;}state.settings.name=name.slice(0,45);state.settings.currency=$('setting-currency').value;state.settings.rate=rate;state.settings.theme=$('setting-theme').value;state.settings.accent=$('setting-accent').value;save();render();toast('Settings saved');break;}
