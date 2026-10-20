@@ -8,7 +8,7 @@ A clean, mobile-first, **offline-ready personal finance web app**. Built with HT
 |---|---|
 | Dashboard | Financial summary, income/expense charts, category breakdown, latest activity, budgets, quick entry, switch months, rename and reorder widgets |
 | Transactions | Multi-item purchase entry with item name, price, date, running sum, review/confirm; add, edit, duplicate, remove, bulk-delete, search, filter, sort, payment methods, categories, dates, notes and tags |
-| Budgets | Monthly/weekly limits, optional category restrictions, 80% and over-budget warnings, one-period rollover |
+| Budgets | Monthly/weekly limits, editable money-received/budget start dates, date-anchored weekly/monthly cycles, optional category restrictions, 80% and over-budget warnings, one-period rollover |
 | Analytics | Today, week, month, year, all time, custom range; category chart, cash-flow chart and spending insights |
 | Savings | Create/edit goals, deposits and withdrawals, history, progress tracking; transfers excluded from income and expenses |
 | Templates | Edit/add/copy/delete transaction shortcuts, report presets, budget starters and savings starters |
@@ -111,3 +111,7 @@ Pocketwise/
 - Use browser developer tools for debugging; no build step is needed.
 
 **Privacy reminder:** If you host the files in a public GitHub repository, only source code is public. Your browser-stored transactions are *not* automatically uploaded to GitHub. Do **not** commit JSON backup files containing your actual financial records.
+
+## Budget start date
+
+Open **Budgets → New budget** to select **Money received / budget start date**. The chosen date starts a repeating weekly or monthly budget cycle. Current cycles and their dates appear on budget cards. Existing budgets without a start date remain on calendar weeks/months until you edit them. This date is a tracking setting, not an income transaction; use **Transactions → Income** to record money actually received.
