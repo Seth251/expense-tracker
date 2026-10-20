@@ -58,7 +58,7 @@
     <div class="app-content">
       <header class="topbar">
         <div class="breadcrumb"><span class="breadcrumb-label">Workspace</span><svg><use href="#i-chevron"/></svg><strong id="crumb-page">Dashboard</strong></div>
-        <div class="top-actions"><span id="today-chip" class="today-chip"></span><button id="header-theme" type="button" class="icon-button" aria-label="Toggle dark mode"><svg><use href="#i-moon"/></svg></button><button id="header-add" type="button" class="btn btn-primary add-header"><svg><use href="#i-plus"/></svg><span>Add purchases</span></button></div>
+        <div class="top-actions"><span id="today-chip" class="today-chip"></span><button id="header-language" data-no-translate type="button" class="language-switch" data-action="toggleLanguage" title="ប្តូរទៅភាសាខ្មែរ" aria-label="ប្តូរទៅភាសាខ្មែរ">ខ្មែរ</button><button id="header-theme" type="button" class="icon-button" aria-label="Toggle dark mode"><svg><use href="#i-moon"/></svg></button><button id="header-add" type="button" class="btn btn-primary add-header"><svg><use href="#i-plus"/></svg><span>Add purchases</span></button></div>
       </header>
       <main id="main" class="main" tabindex="-1" aria-live="polite"></main>
     </div>
@@ -67,6 +67,7 @@
   <button id="mobile-fab" class="mobile-fab" type="button" aria-label="Add purchased items"><svg><use href="#i-plus"/></svg></button>
   <div id="modal-root"></div>
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <script src="./assets/js/i18n.js" defer></script>
   <script src="./assets/js/app.js" defer></script>
 </body>
 </html>
