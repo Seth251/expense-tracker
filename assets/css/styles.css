@@ -41,3 +41,18 @@
 @media print{
  .balance-summary{break-inside:avoid}
 }
+
+/* Bilingual Khmer / English controls and typography */
+html[data-language="km"], html[data-language="km"] body, html[data-language="km"] button, html[data-language="km"] input, html[data-language="km"] select, html[data-language="km"] textarea {
+ font-family:"Noto Sans Khmer","Khmer OS Battambang","Khmer OS System",system-ui,-apple-system,sans-serif;
+}
+html[data-language="km"] body {line-height:1.7}
+html[data-language="km"] .eyebrow,html[data-language="km"] .sidebar-caption,html[data-language="km"] .stat-label {letter-spacing:0}
+html[data-language="km"] .page-head h1 {line-height:1.45}
+html[data-language="km"] .nav-item span {line-height:1.6}
+html[data-language="km"] .bottom-nav button {font-size:10px;line-height:1.4}
+.language-switch{border:1px solid var(--line);background:var(--surface-2);color:var(--text);padding:7px 12px;min-width:55px;min-height:36px;border-radius:11px;font-weight:800;font-size:12px;white-space:nowrap}
+.language-switch:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.language-switch:hover{border-color:var(--accent)}
+@media(max-width:590px){.language-switch{padding:6px 9px;min-width:45px;font-size:11px}.top-actions{gap:5px}}
+@media print{.language-switch{display:none!important}html[data-language="km"] .report-preview{font-family:"Noto Sans Khmer","Khmer OS Battambang",system-ui,sans-serif}}
