@@ -26,3 +26,18 @@
 @media(max-width:590px){.purchase-modal{width:100%!important;max-height:96vh!important;border-radius:20px 20px 0 0}.purchase-modal .modal-body{padding:16px 15px 14px}.purchase-modal .modal-actions{padding:13px 14px calc(15px + env(safe-area-inset-bottom,0px))}.purchase-modal .modal-actions .btn{flex:1;font-size:12px;padding:12px 9px}.purchase-modal .modal-actions .btn-primary{min-width:0}.purchase-intro{padding:14px 15px;margin-bottom:17px}.purchase-shared{gap:9px;margin-bottom:19px}.purchase-shared .control{font-size:12px}.purchase-entry-row{padding:13px 12px 14px;border-radius:14px}.purchase-fields{gap:10px;grid-template-columns:minmax(0,1fr) minmax(0,1fr)}.purchase-fields .control{font-size:12px}.purchase-list-head p{font-size:10px}.purchase-add-more span{display:none}.purchase-total{padding:15px 16px}.purchase-total strong{font-size:27px}.purchase-review-item{padding:13px 11px;gap:9px}.purchase-review-total{padding:15px}.purchase-review-total>strong{font-size:20px}.purchase-quick-strip{flex-wrap:wrap;gap:8px;padding:14px 15px}.purchase-quick-strip>div{flex-basis:calc(100% - 60px)}.purchase-quick-strip .btn{width:100%;justify-content:center}.hero-actions{display:none}}
 .purchase-actions-total{margin-right:auto;display:grid;gap:1px;align-self:center;min-width:130px}.purchase-actions-total span{font-size:10px;color:var(--muted);font-weight:800;letter-spacing:.3px}.purchase-actions-total strong{font-size:21px;font-weight:900;color:var(--accent);font-variant-numeric:tabular-nums;line-height:1.2}
 @media(max-width:590px){.purchase-modal .modal-actions{flex-wrap:wrap;gap:8px}.purchase-actions-total{flex-basis:100%;margin-right:0;padding:0 2px 4px;display:flex;align-items:baseline;justify-content:space-between}.purchase-actions-total strong{font-size:20px}}
+
+
+/* Report balance cards: easy to read on mobile and in printable reports. */
+.balance-summary>div{min-width:0;background:var(--surface-2)}
+.balance-summary strong{overflow-wrap:anywhere;font-variant-numeric:tabular-nums}
+.balance-summary>div:last-child{border-color:var(--accent);background:var(--accent-soft)}
+@media(max-width:590px){
+ .balance-summary{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .balance-summary>div{padding:12px}
+ .balance-summary>div:last-child{grid-column:1/-1}
+ .balance-summary strong{font-size:16px}
+}
+@media print{
+ .balance-summary{break-inside:avoid}
+}
