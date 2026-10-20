@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <meta name="theme-color" content="#f6f8fb" />
+  <meta name="description" content="Pocketwise — your personal offline-first money tracker" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="apple-mobile-web-app-title" content="Pocketwise" />
+  <link rel="manifest" href="./manifest.webmanifest" />
+  <link rel="icon" href="./assets/icons/icon.svg" type="image/svg+xml" />
+  <link rel="apple-touch-icon" href="./assets/icons/apple-touch-icon.png" />
+  <link rel="stylesheet" href="./assets/css/styles.css" />
+  <title>Pocketwise • Personal Finance</title>
+</head>
+<body>
+  <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" width="0" height="0" class="sprite" style="position:absolute">
+    <symbol id="i-grid" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1.7"/><rect x="14" y="3" width="7" height="7" rx="1.7"/><rect x="3" y="14" width="7" height="7" rx="1.7"/><rect x="14" y="14" width="7" height="7" rx="1.7"/></symbol>
+    <symbol id="i-wallet" viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="15" rx="3"/><path d="M4 7V5a2 2 0 0 1 2-2h12"/><path d="M16 12h5v5h-5a2.5 2.5 0 0 1 0-5Z"/><path d="M17 14.5h.01"/></symbol>
+    <symbol id="i-transactions" viewBox="0 0 24 24"><path d="M4 7h16M4 17h16M8 3 4 7l4 4M16 13l4 4-4 4"/></symbol>
+    <symbol id="i-chart" viewBox="0 0 24 24"><path d="M3 20h18M6 16v-5M11 16V7M16 16V4M21 16v-8"/></symbol>
+    <symbol id="i-goal" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1"/></symbol>
+    <symbol id="i-layers" viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="6" rx="2"/><rect x="4" y="14" width="16" height="6" rx="2"/><path d="M8 7h5M8 17h5"/></symbol>
+    <symbol id="i-file" viewBox="0 0 24 24"><path d="M6 2h8l5 5v14a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1Z"/><path d="M14 2v6h5M8 13h8M8 17h8"/></symbol>
+    <symbol id="i-settings" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="m19.4 15 .2.3 1.1 1.5-2 3.4-1.9-.4-.4-.1-1.1.7-.6 1.8H9.3l-.6-1.8-1.1-.7-.4.1-1.9.4-2-3.4 1.1-1.5.2-.3V9l-.2-.3-1.1-1.5 2-3.4 1.9.4.4.1 1.1-.7.6-1.8h5.4l.6 1.8 1.1.7.4-.1 1.9-.4 2 3.4-1.1 1.5-.2.3Z"/></symbol>
+    <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 4v16M4 12h16"/></symbol>
+    <symbol id="i-search" viewBox="0 0 24 24"><circle cx="10.8" cy="10.8" r="7"/><path d="m16 16 5 5"/></symbol>
+    <symbol id="i-chevron" viewBox="0 0 24 24"><path d="m9 5 7 7-7 7"/></symbol>
+    <symbol id="i-arrow-up" viewBox="0 0 24 24"><path d="m5 15 7-7 7 7M12 8v13"/></symbol>
+    <symbol id="i-arrow-down" viewBox="0 0 24 24"><path d="m5 9 7 7 7-7M12 3v13"/></symbol>
+    <symbol id="i-download" viewBox="0 0 24 24"><path d="M12 3v13m0 0 5-5m-5 5-5-5M4 18v3h16v-3"/></symbol>
+    <symbol id="i-edit" viewBox="0 0 24 24"><path d="m4 20 5-.9L20 8a3 3 0 0 0-4-4L5 15l-1 5Z"/></symbol>
+    <symbol id="i-trash" viewBox="0 0 24 24"><path d="M4 7h16M9 7V4h6v3M6 7l1 14h10l1-14M10 11v6M14 11v6"/></symbol>
+    <symbol id="i-close" viewBox="0 0 24 24"><path d="m5 5 14 14M19 5 5 19"/></symbol>
+    <symbol id="i-calendar" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M7 3v4M17 3v4M3 10h18"/></symbol>
+    <symbol id="i-moon" viewBox="0 0 24 24"><path d="M21 13.7A9 9 0 0 1 10.3 3 9 9 0 1 0 21 13.7Z"/></symbol>
+    <symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M2 12h2m16 0h2M4.9 4.9l1.4 1.4m11.4 11.4 1.4 1.4M19.1 4.9l-1.4 1.4M6.3 17.7l-1.4 1.4"/></symbol>
+    <symbol id="i-filter" viewBox="0 0 24 24"><path d="M4 6h16M7 12h10M10 18h4"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24"><path d="m4 12 5 5L20 6"/></symbol>
+    <symbol id="i-back" viewBox="0 0 24 24"><path d="m15 5-7 7 7 7"/></symbol>
+    <symbol id="i-repeat" viewBox="0 0 24 24"><path d="M20 7H7l3-3M7 7l3 3M4 17h13l-3-3m3 3-3 3"/></symbol>
+    <symbol id="i-more" viewBox="0 0 24 24"><circle cx="5" cy="12" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/></symbol>
+    <symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v6m0-10v.5"/></symbol>
+  </svg>
+  <div id="app">
+    <aside class="sidebar" aria-label="Main navigation">
+      <div class="brand" role="button" tabindex="0" id="brand-home">
+        <div class="brand-symbol"><svg viewBox="0 0 24 24"><use href="#i-chart"/></svg></div>
+        <div class="brand-copy"><strong class="brand-name">Pocketwise</strong><small>PERSONAL FINANCE</small></div>
+      </div>
+      <div class="sidebar-caption">WORKSPACE</div>
+      <nav id="side-nav" class="side-nav"></nav>
+      <div class="sidebar-bottom">
+        <div class="sidebar-tip"><span class="tip-dot"></span><strong>Your money, your rules.</strong><small>Private, offline-ready tracking.</small></div>
+        <button id="side-theme" class="side-theme" type="button"><svg><use href="#i-moon"/></svg> <span>Toggle appearance</span></button>
+      </div>
+    </aside>
+    <div class="app-content">
+      <header class="topbar">
+        <div class="breadcrumb"><span class="breadcrumb-label">Workspace</span><svg><use href="#i-chevron"/></svg><strong id="crumb-page">Dashboard</strong></div>
+        <div class="top-actions"><span id="today-chip" class="today-chip"></span><button id="header-theme" type="button" class="icon-button" aria-label="Toggle dark mode"><svg><use href="#i-moon"/></svg></button><button id="header-add" type="button" class="btn btn-primary add-header"><svg><use href="#i-plus"/></svg><span>Add purchases</span></button></div>
+      </header>
+      <main id="main" class="main" tabindex="-1" aria-live="polite"></main>
+    </div>
+  </div>
+  <nav id="bottom-nav" class="bottom-nav" aria-label="Mobile navigation"></nav>
+  <button id="mobile-fab" class="mobile-fab" type="button" aria-label="Add purchased items"><svg><use href="#i-plus"/></svg></button>
+  <div id="modal-root"></div>
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <script src="./assets/js/app.js" defer></script>
+</body>
+</html>
