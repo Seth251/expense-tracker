@@ -8,7 +8,7 @@ A clean, mobile-first, **offline-ready personal finance web app**. Built with HT
 |---|---|
 | Dashboard | Financial summary, income/expense charts, category breakdown, latest activity, budgets, quick entry, switch months, rename and reorder widgets |
 | Transactions | Multi-item purchase entry with item name, price, date, running sum, review/confirm; add, edit, duplicate, remove, bulk-delete, search, filter, sort, payment methods, categories, dates, notes and tags |
-| Budgets | Monthly/weekly limits, editable money-received/budget start dates, date-anchored weekly/monthly cycles, optional category restrictions, 80% and over-budget warnings, one-period rollover |
+| Budgets | Enter a budget amount and optional money-received date, automatically subtract all matching saved expenses regardless of date, show remaining money and over-budget warnings; optional category-specific budgets |
 | Analytics | Today, week, month, year, all time, custom range; category chart, cash-flow chart and spending insights |
 | Savings | Create/edit goals, deposits and withdrawals, history, progress tracking; transfers excluded from income and expenses |
 | Templates | Edit/add/copy/delete transaction shortcuts, report presets, budget starters and savings starters |
@@ -112,6 +112,8 @@ Pocketwise/
 
 **Privacy reminder:** If you host the files in a public GitHub repository, only source code is public. Your browser-stored transactions are *not* automatically uploaded to GitHub. Do **not** commit JSON backup files containing your actual financial records.
 
-## Budget start date
+## Automatic budget calculations
 
-Open **Budgets → New budget** to select **Money received / budget start date**. The chosen date starts a repeating weekly or monthly budget cycle. Current cycles and their dates appear on budget cards. Existing budgets without a start date remain on calendar weeks/months until you edit them. This date is a tracking setting, not an income transaction; use **Transactions → Income** to record money actually received.
+Open **Budgets → Add budget** and enter a budget amount and optional date you received the money. Pocketwise automatically sums **all saved expenses** (including individual multi-item purchases) and subtracts them from your budget amount, regardless of transaction date. The date is informational only and does not reset calculations. Category-specific budgets only count expenses in the selected category; “All expenses” counts every expense. Income and savings transfers are excluded from expense totals.
+
+**Example:** $500 budget − $120 recorded expenses = **$380 remaining**. If you add another $15 purchase, remaining updates to $365 automatically. Existing budget records remain saved and use the new calculation.
