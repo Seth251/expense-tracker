@@ -156,3 +156,10 @@ The **ទាញយករបាយការណ៍ / Download PDF** and **All purc
 Note: Khmer image-based PDF pages are readable but their text is not directly selectable/searchable and downloads may be larger. **Print / Save as PDF** remains available to produce browser-rendered, potentially selectable Khmer text when supported by the device. The on-screen report and stored transaction data are never overwritten by exporting.
 
 Khmer character detection is also applied when the interface is set to English: if a selected purchase or report appendix contains Khmer names, notes, categories, methods, or tags, PDF download switches to the Khmer-safe renderer automatically rather than replacing glyphs with question marks. Khmer-mode exports preserve the selected report filters, balance calculations and saved purchase details.
+
+
+## PDF language follows the selected app language
+
+The downloadable report now uses **English** for built-in headings and labels when the app is set to English, and **Khmer (ខ្មែរ)** when the app is set to Khmer. Switch languages with the header **ខ្មែរ / EN** control or **Settings → Language / ភាសា** before downloading. The exporter applies the selected language to the PDF title (when it matches a built-in title), balances, expense summary, category labels, section titles, page numbers, and footer. Original amounts and user-entered item names and notes remain unchanged.
+
+For English interface reports containing Khmer item names or notes, the app still uses the Khmer-glyph-safe PDF renderer so user-entered Khmer characters don't turn into question marks, but built-in PDF labels stay in English. Fully English reports continue using the original selectable-text PDF implementation. Khmer-language reports remain image-based to retain glyph shaping. Both styles work offline.
