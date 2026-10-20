@@ -474,7 +474,17 @@
   "Your monthly budget": "ថវិកាប្រចាំខែរបស់អ្នក",
   "Update data": "ធ្វើបច្ចុប្បន្នភាពទិន្នន័យ",
   "Select reporting period": "ជ្រើសរើសរយៈពេលរបាយការណ៍",
-  "Create budget to begin": "បង្កើតថវិកាដើម្បីចាប់ផ្តើម"
+  "Create budget to begin": "បង្កើតថវិកាដើម្បីចាប់ផ្តើម",
+  "Coffee": "កាហ្វេ",
+  "Lunch": "អាហារថ្ងៃត្រង់",
+  "Daily Expense Tracker": "បញ្ជីតាមដានចំណាយប្រចាំថ្ងៃ",
+  "Weekly Expense Tracker": "បញ្ជីតាមដានចំណាយប្រចាំសប្តាហ៍",
+  "Monthly Expense Tracker": "បញ្ជីតាមដានចំណាយប្រចាំខែ",
+  "Student Budget": "ថវិកាសម្រាប់សិស្សនិស្សិត",
+  "Personal Finance Planner": "ផែនការហិរញ្ញវត្ថុផ្ទាល់ខ្លួន",
+  "Savings Planner": "ផែនការសន្សំប្រាក់",
+  "Subscription Tracker": "តាមដានសេវាប្រចាំខែ",
+  "Monthly Financial Report": "របាយការណ៍ហិរញ្ញវត្ថុប្រចាំខែ"
 };
   const originalText = new WeakMap();
   const appliedText = new WeakMap();
