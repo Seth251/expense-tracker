@@ -12,7 +12,7 @@ A clean, mobile-first, **offline-ready personal finance web app**. Built with HT
 | Analytics | Today, week, month, year, all time, custom range; category chart, cash-flow chart and spending insights |
 | Savings | Create/edit goals, deposits and withdrawals, history, progress tracking; transfers excluded from income and expenses |
 | Templates | Edit/add/copy/delete transaction shortcuts, report presets, budget starters and savings starters |
-| Reports | Income/expense, budget and savings reports; PDF (portrait/landscape, multipage), PDF preview, print-to-PDF, CSV and real .xlsx Excel files |
+| Reports | All Purchases & Expenses itemized by date, item name, original price/currency, category, payment method, notes and tags; complete multipage PDF, filtered financial/budget/savings reports, CSV and .xlsx |
 | Settings | USD/KHR, custom exchange rate, theme, accent color, editable dashboard labels, category icons/colors, payment methods, recurring schedules, JSON backup/restore, CSV import, complete reset |
 
 **Works offline after the initial online visit and installation** when served over HTTPS, such as GitHub Pages. Charts and document exports are built into the app, so no external chart/PDF/Excel libraries need to load at runtime.
@@ -117,3 +117,9 @@ Pocketwise/
 Open **Budgets → Add budget** and enter a budget amount and optional date you received the money. Pocketwise automatically sums **all saved expenses** (including individual multi-item purchases) and subtracts them from your budget amount, regardless of transaction date. The date is informational only and does not reset calculations. Category-specific budgets only count expenses in the selected category; “All expenses” counts every expense. Income and savings transfers are excluded from expense totals.
 
 **Example:** $500 budget − $120 recorded expenses = **$380 remaining**. If you add another $15 purchase, remaining updates to $365 automatically. Existing budget records remain saved and use the new calculation.
+
+## Download a complete itemized expense report
+
+Open **Reports** and select **All purchases & expenses (itemized)**. The default reporting period is **All time**, so every saved expense is listed separately, including items added together in the multi-item purchase form. The downloaded PDF includes the purchase date, full item name or transaction description, original price and currency, expense category, payment method, notes and tags when entered, and a total expense summary. Long item descriptions or notes wrap onto additional lines and long reports continue onto multiple pages. The report's expense total is converted into the display currency selected in Settings.
+
+For a PDF of absolutely **all purchases regardless of report filters**, click **All purchases PDF** on Reports or Transactions. Financial reports retain their optional date and type filters. Budget and savings PDFs include an all-purchases appendix. Reports are generated from saved entries on your device; no example data is inserted.
