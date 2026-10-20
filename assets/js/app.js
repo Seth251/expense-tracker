@@ -330,7 +330,33 @@ function renderTemplates(){const quick=state.templates.filter(t=>t.kind==='trans
  $('main').innerHTML=pageHead('WORK SMARTER','Templates','Reusable, fully editable shortcuts for everyday money tasks.',`<button class="btn btn-soft" data-action="resetTemplates">${icon('repeat')} Restore defaults</button><button class="btn btn-primary" data-action="addTemplate">${icon('plus')} New template</button>`)+`<h2 class="section-label">⚡ Quick transactions</h2>${quick.length?`<div class="template-grid">${quick.map(card).join('')}</div>`:empty('layers','No transaction shortcuts yet','Create your first quick-add template.')}<h2 class="section-label">📑 Planning & report templates</h2>${others.length?`<div class="template-grid">${others.map(card).join('')}</div>`:empty('layers','No planning templates yet','Create a custom reusable planner.')}`;
 }
 
-function reportRange(){return report.period==='custom'?{from:report.from||today(),to:report.to||today()}:periodRange(report.period);}
+function reportInitialFrom(){
+ // Use the earliest saved purchase or entered budget date when a custom range is first chosen.
+ // A budget start date never changes a purchase's saved transaction date.
+ const dates=[...state.transactions.map(t=>t.date),...state.budgets.map(b=>b.startDate)].filter(validISODate);
+ return dates.length?dates.sort()[0]:today();
+}
+function reportRange(){
+ if(report.period!=='custom')return periodRange(report.period);
+ const from=report.from||reportInitialFrom(),to=report.to||today();
+ return {from,to};
+}
+function applyReportDates(renderPreview=true){
+ if(page!=='reports'||report.period!=='custom')return true;
+ const from=$('report-from')?.value||'',to=$('report-to')?.value||'';
+ if(!validISODate(from)||!validISODate(to)){
+  toast('Select both valid report dates before downloading.',true);
+  return false;
+ }
+ if(from>to){
+  toast('The From date cannot be after the To date.',true);
+  return false;
+ }
+ report.from=from;report.to=to;
+ if(renderPreview){renderReports();toast('Report updated: '+fmtDate(from)+' – '+fmtDate(to));}
+ return true;
+}
+function reportHasValidRange(){return report.period!=='custom'||(validISODate(report.from)&&validISODate(report.to)&&report.from<=report.to);}
 function reportPeriodLabel(range){return range.from==='0001-01-01'&&range.to==='9999-12-31'?'All dates':fmtDate(range.from)+' – '+fmtDate(range.to);}
 function reportTransactions(){
  const r=reportRange(),purchases=report.mode==='purchases';
@@ -359,7 +385,7 @@ function renderReports(){
  ${field('Report content',`<select class="control" id="report-mode"><option value="purchases" ${purchases?'selected':''}>All purchases & expenses (itemized)</option><option value="finance" ${mode==='finance'?'selected':''}>Income & expense report</option><option value="budget" ${mode==='budget'?'selected':''}>Budget performance</option><option value="savings" ${mode==='savings'?'selected':''}>Savings goals</option></select>`)}
  ${field('Report title',txtInput('report-title',state.settings.reportTitle,'All Purchases & Expenses Report'))}
  ${field('Reporting period',`<select class="control" id="report-period"><option value="all" ${report.period==='all'?'selected':''}>All time (every purchase)</option><option value="today" ${report.period==='today'?'selected':''}>Today</option><option value="week" ${report.period==='week'?'selected':''}>This week</option><option value="month" ${report.period==='month'?'selected':''}>This month</option><option value="lastmonth" ${report.period==='lastmonth'?'selected':''}>Last month</option><option value="year" ${report.period==='year'?'selected':''}>This year</option><option value="custom" ${report.period==='custom'?'selected':''}>Custom range</option></select>`)}
- ${report.period==='custom'?`<div class="fields-grid">${field('From',txtInput('report-from',report.from||today(),'',true,'date'))}${field('To',txtInput('report-to',report.to||today(),'',true,'date'))}</div>`:''}
+ ${report.period==='custom'?`<div class="fields-grid">${field('From — first purchase date included',txtInput('report-from',report.from||reportInitialFrom(),'',true,'date'))}${field('To — last purchase date included',txtInput('report-to',report.to||today(),'',true,'date'))}</div><button type="button" class="btn btn-primary btn-sm" data-action="applyReportDates">${icon('check')} Apply date range</button><p class="small muted" id="report-custom-status" style="margin:8px 0 0">Both dates are included. After picking the dates, tap Apply date range to refresh the preview and download exactly that period.</p>`:''}
  ${!purchases?field('Transaction type',`<select class="control" id="report-type"><option value="all" ${report.type==='all'?'selected':''}>All transactions</option><option value="expense" ${report.type==='expense'?'selected':''}>Expenses only</option><option value="income" ${report.type==='income'?'selected':''}>Income only</option></select>`):'<p class="small muted">This report includes every recorded expense, not income or savings transfers.</p>'}
  ${field('Category',`<select class="control" id="report-category">${catOptions('all',report.category,true)}</select>`)}
  ${field('PDF orientation',`<select id="report-orientation" class="control"><option value="portrait" ${!state.settings.reportLandscape?'selected':''}>Portrait</option><option value="landscape" ${state.settings.reportLandscape?'selected':''}>Landscape</option></select>`)}
@@ -519,11 +545,12 @@ async function clickAction(action,id){switch(action){
  case 'monthprev':{const y=dashboardMonth+'-15';dashboardMonth=addMonths(y,-1).slice(0,7);render();break;}
  case 'monthnext':{const y=dashboardMonth+'-15';dashboardMonth=addMonths(y,1).slice(0,7);render();break;}
  case 'exportJSON':exportJSON();break;
- case 'exportCSV':exportCSV();break;
- case 'exportXLSX':exportXLSX();break;
- case 'exportPDF':pdfExport();break;
+ case 'exportCSV':if(applyReportDates(false))exportCSV();break;
+ case 'exportXLSX':if(applyReportDates(false))exportXLSX();break;
+ case 'exportPDF':if(applyReportDates(false))pdfExport();break;
+ case 'applyReportDates':applyReportDates(true);break;
  case 'allPurchasesPDF':pdfExport(allPurchaseReportPayload());break;
- case 'printReport':window.print();break;
+ case 'printReport':if(applyReportDates(false)){if(page==='reports')renderReports();window.print();}break;
  case 'analyticsReport':report.period=analyticPeriod;if(analyticPeriod==='custom'){report.from=analyticsFrom;report.to=analyticsTo;}page='reports';render();break;
  case 'saveSettings':{const name=document.querySelector('[name="setting-name"]')?.value.trim();const rate=number(document.querySelector('[name="setting-rate"]')?.value,0);if(!name||rate<=0){toast('Enter a valid name and positive exchange rate.',true);break;}state.settings.name=name.slice(0,45);state.settings.currency=$('setting-currency').value;state.settings.rate=rate;state.settings.theme=$('setting-theme').value;state.settings.accent=$('setting-accent').value;save();render();toast('Settings saved');break;}
  case 'saveLabels':{for(const k of Object.keys(state.settings.labels)){const value=document.querySelector(`[name="label-${k}"]`)?.value.trim();if(value)state.settings.labels[k]=value.slice(0,35);}save();render();toast('Dashboard labels saved');break;}
@@ -539,7 +566,23 @@ function handleChange(e){const target=e.target,id=target.id;
  if(id==='analytics-from'){analyticsFrom=target.value;renderAnalytics();return;}
  if(id==='analytics-to'){analyticsTo=target.value;renderAnalytics();return;}
  if(id==='report-title'){state.settings.reportTitle=target.value.slice(0,70)||'Financial Report';save();renderReports();return;}
- const reportFields={'report-mode':'mode','report-period':'period','report-type':'type','report-category':'category','report-from':'from','report-to':'to'};if(reportFields[id]){report[reportFields[id]]=target.value;renderReports();return;}
+ if(id==='report-from'||id==='report-to'){
+  // Never replace a native iOS date picker while the user is entering a date.
+  // Keep both inputs intact until the explicit Apply date range action.
+  const status=$('report-custom-status');
+  if(status)status.textContent='Dates changed — tap Apply date range to refresh the results.';
+  return;
+ }
+ const reportFields={'report-mode':'mode','report-period':'period','report-type':'type','report-category':'category'};
+ if(reportFields[id]){
+  report[reportFields[id]]=target.value;
+  if(id==='report-period'&&report.period==='custom'){
+   if(!validISODate(report.from))report.from=reportInitialFrom();
+   if(!validISODate(report.to))report.to=today();
+   if(report.from>report.to)report.to=report.from;
+  }
+  renderReports();return;
+ }
  if(id==='report-orientation'){state.settings.reportLandscape=target.value==='landscape';save();renderReports();return;}
  const key=target.dataset.setting;if(key){state.settings[key]=target.checked;save();renderReports();return;}
  if(id==='import-file'){importJSONFile(target.files[0]).catch(e=>toast(e.message,true));target.value='';return;}
