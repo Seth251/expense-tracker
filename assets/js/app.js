@@ -473,8 +473,10 @@ function pdfDate(s){if(!s)return'—';const [y,m,d]=s.split('-').map(Number);ret
 async function downloadReportPDF(overridePayload=null){
  const payload=overridePayload||reportPayload(),mode=payload.mode||report.mode||'purchases';
  const containsKhmer=/[\u1780-\u17ff\u19e0-\u19ff]/;
- const hasKhmerEntries=payload.tx.some(t=>[t.description,t.notes,t.method,...(t.tags||[]),categoryName(t.categoryId)].some(v=>containsKhmer.test(String(v||''))))||
+ const exportItems=(mode==='budget'||mode==='savings')?state.transactions.filter(t=>t.type==='expense'):payload.tx;
+ const hasKhmerEntries=exportItems.some(t=>[t.description,t.notes,t.method,...(t.tags||[]),categoryName(t.categoryId)].some(v=>containsKhmer.test(String(v||''))))||
    state.budgets.some(b=>containsKhmer.test(b.name||''))||
+   state.goals.some(g=>containsKhmer.test(g.name||''))||
    containsKhmer.test(payload.title||'');
  // Also use the Khmer-capable renderer for Khmer purchases entered while the UI is in English.
  if(state.settings.language!=='km'&&!hasKhmerEntries){pdfExport(overridePayload);return;}
