@@ -463,6 +463,33 @@ function pdfExport(overridePayload=null){const payload=overridePayload||reportPa
  const width=W-2*pad;
  makePage();text(state.settings.name.toUpperCase(),pad,y,11,true,'#11845f');y-=25;text(payload.title,pad,y,21,true);y-=21;text(`${payload.rangeLabel||fmtDate(payload.range.from)+' - '+fmtDate(payload.range.to)}  |  ${payload.cur}  |  Generated ${fmtDate(today())}`,pad,y,9,false,'#687987');y-=28;
  if(state.settings.reportSummary){const cols=mode==='purchases'?[['ITEMS BOUGHT',payload.tx.length],['TOTAL EXPENSES',payload.expenses],['SPENDING TOTAL',payload.expenses]]:[['INCOME',payload.income],['EXPENSES',payload.expenses],['NET CASH FLOW',payload.net]],cw=(width-16)/3;cols.forEach(([label,amt],i)=>{const x=pad+i*(cw+8);box(x,y-60,cw,64,'#f0f5f3');text(label,x+11,y-19,8,true,'#75857f');text(label==='ITEMS BOUGHT'?String(amt):pdfMoney(amt,payload.cur),x+11,y-45,14,true,'#153b2d');});y-=85;}
+ const balances=reportBalances(payload);
+ pageBreak(125);
+ text('FIRST & REMAINING BALANCE',pad,y,11,true);y-=23;
+ const balanceColumns=balances.budget?[
+  ['FIRST BALANCE',pdfMoney(balances.first,payload.cur)],
+  ['TOTAL EXPENSES',pdfMoney(balances.spent,payload.cur)],
+  ['REMAINING BALANCE',pdfMoney(balances.remaining,payload.cur)]
+ ]:[
+  ['FIRST BALANCE','Not set'],
+  ['TOTAL EXPENSES',pdfMoney(balances.spent,payload.cur)],
+  ['REMAINING BALANCE','Not available']
+ ];
+ const cellW=(width-16)/3;
+ balanceColumns.forEach(([label,value],i)=>{
+  const x=pad+i*(cellW+8);
+  box(x,y-61,cellW,65,label==='REMAINING BALANCE'&&balances.remaining!=null?(balances.remaining<0?'#fff0f1':'#e9f7f1'):'#f0f5f3');
+  text(label,x+8,y-17,7.2,true,'#75857f');
+  text(value.length>24?value.slice(0,24):value,x+8,y-42,value.length>18?9:11,true,label==='REMAINING BALANCE'&&balances.remaining<0?'#c43e4e':'#153b2d');
+ });
+ y-=80;
+ if(balances.budget){
+  const detail='Budget: '+balances.budget.name+(balances.budget.startDate?' | Money received: '+fmtDate(balances.budget.startDate):'');
+  text(detail.slice(0,land?105:79),pad,y,8,false,'#687987');y-=15;
+  text('Remaining = selected first balance - expenses in this report.',pad,y,8,false,'#687987');y-=18;
+ }else{
+  text('No budget selected or saved. Add a budget to show balances.',pad,y,8,false,'#687987');y-=23;
+ }
  if(report.mode==='budget'){pageBreak(45);text('BUDGET PERFORMANCE',pad,y,11,true);y-=26;if(!state.budgets.length){text('No budgets recorded.',pad,y,9);y-=18;}for(const b of state.budgets){pageBreak(37);const u=budgetUsage(b);text(b.name.slice(0,38),pad,y,9,true);text(`${Math.round(u.percent)}% used`,pad+width-105,y,9);y-=13;box(pad,y-5,width*.65,8,'#e7edef');box(pad,y-5,width*.65*clamp(u.percent,0,100)/100,8,u.percent>100?'#df5365':'#13a77c');y-=24;text(`${pdfMoney(u.spent,payload.cur)} spent / ${pdfMoney(u.limit,payload.cur)} allowed`,pad,y,8);y-=23;}}
  if(report.mode==='savings'){pageBreak(45);text('SAVINGS GOAL PERFORMANCE',pad,y,11,true);y-=26;if(!state.goals.length){text('No savings goals recorded.',pad,y,9);y-=18;}for(const g of state.goals){pageBreak(37);const amount=goalsSaved(g.id),target=toUSD(g.targetMinor,g.currency),pct=percentage(amount,target);text(g.name.slice(0,38),pad,y,9,true);text(`${pct}% complete`,pad+width-110,y,9);y-=13;box(pad,y-5,width*.65,8,'#e7edef');box(pad,y-5,width*.65*clamp(pct,0,100)/100,8,'#13a77c');y-=24;text(`${pdfMoney(amount,payload.cur)} saved / ${pdfMoney(target,payload.cur)} target`,pad,y,8);y-=23;}}
  if((mode==='finance'||mode==='purchases')&&state.settings.reportCharts){const categoryRows=spentFromTx(payload.tx).slice(0,6);pageBreak(70);text('SPENDING BY CATEGORY',pad,y,11,true);y-=19;if(!categoryRows.length){text('No expense categories in this period.',pad,y,9);y-=18;}else{const max=categoryRows[0].amount;for(const c of categoryRows){pageBreak(24);text(categoryName(c.id).slice(0,28),pad,y,9);const bx=pad+170,bw=Math.max(0,Math.min(width-310,(width-310)*c.amount/max));box(bx,y-2,bw,9,c.color||hashColor(c.id));text(pdfMoney(c.amount,payload.cur),pad+width-108,y,9,true);y-=23;}}y-=15;}
