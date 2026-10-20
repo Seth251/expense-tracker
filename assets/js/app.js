@@ -373,6 +373,10 @@ function allPurchaseReportPayload(){
 }
 function renderReports(){
  const p=reportPayload(),mode=report.mode||'purchases',purchases=mode==='purchases';
+ const savedExpenseDates=state.transactions.filter(t=>t.type==='expense'&&validISODate(t.date)).map(t=>t.date).sort();
+ const savedExpenseNote=savedExpenseDates.length
+  ?String(savedExpenseDates.length)+' saved expenses on this device · '+fmtDate(savedExpenseDates[0])+' to '+fmtDate(savedExpenseDates[savedExpenseDates.length-1])
+  :'No expense records saved on this device yet';
  const summary=purchases?`<div class="preview-summary"><div><small>ITEMS PURCHASED</small><strong>${p.tx.length}</strong></div><div><small>EXPENSE TOTAL</small><strong class="negative">${formatMoney(p.expenses)}</strong></div><div><small>REPORT CURRENCY</small><strong>${esc(p.cur)}</strong></div></div>`:
  `<div class="preview-summary"><div><small>TOTAL INCOME</small><strong class="positive">${formatMoney(p.income)}</strong></div><div><small>TOTAL EXPENSES</small><strong class="negative">${formatMoney(p.expenses)}</strong></div><div><small>NET CASH FLOW</small><strong>${formatMoney(p.net)}</strong></div></div>`;
  const extraPreview=mode==='budget'?`<h3 class="small">Budget performance</h3>${state.budgets.length?state.budgets.map(b=>{const u=budgetUsage(b);return `<div class="budget-line"><div class="budget-info"><strong>${esc(b.name)}</strong><div class="progress mini-progress"><span style="width:${clamp(u.percent,0,100)}%"></span></div></div><strong>${formatMoney(u.spent)} / ${formatMoney(u.limit)}</strong></div>`;}).join(''):empty('wallet','No budgets','Create budgets to include them in this report.')}`:
@@ -386,14 +390,14 @@ function renderReports(){
  ${field('Report title',txtInput('report-title',state.settings.reportTitle,'All Purchases & Expenses Report'))}
  ${field('Reporting period',`<select class="control" id="report-period"><option value="all" ${report.period==='all'?'selected':''}>All time (every purchase)</option><option value="today" ${report.period==='today'?'selected':''}>Today</option><option value="week" ${report.period==='week'?'selected':''}>This week</option><option value="month" ${report.period==='month'?'selected':''}>This month</option><option value="lastmonth" ${report.period==='lastmonth'?'selected':''}>Last month</option><option value="year" ${report.period==='year'?'selected':''}>This year</option><option value="custom" ${report.period==='custom'?'selected':''}>Custom range</option></select>`)}
  ${report.period==='custom'?`<div class="fields-grid">${field('From — first purchase date included',txtInput('report-from',report.from||reportInitialFrom(),'',true,'date'))}${field('To — last purchase date included',txtInput('report-to',report.to||today(),'',true,'date'))}</div><button type="button" class="btn btn-primary btn-sm" data-action="applyReportDates">${icon('check')} Apply date range</button><p class="small muted" id="report-custom-status" style="margin:8px 0 0">Both dates are included. After picking the dates, tap Apply date range to refresh the preview and download exactly that period.</p>`:''}
- ${!purchases?field('Transaction type',`<select class="control" id="report-type"><option value="all" ${report.type==='all'?'selected':''}>All transactions</option><option value="expense" ${report.type==='expense'?'selected':''}>Expenses only</option><option value="income" ${report.type==='income'?'selected':''}>Income only</option></select>`):'<p class="small muted">This report includes every recorded expense, not income or savings transfers.</p>'}
+ ${!purchases?field('Transaction type',`<select class="control" id="report-type"><option value="all" ${report.type==='all'?'selected':''}>All transactions</option><option value="expense" ${report.type==='expense'?'selected':''}>Expenses only</option><option value="income" ${report.type==='income'?'selected':''}>Income only</option></select>`):'<p class="small muted">This report includes every recorded expense, not income or savings transfers. A budget date is not the same as a purchase date.</p>'}
  ${field('Category',`<select class="control" id="report-category">${catOptions('all',report.category,true)}</select>`)}
  ${field('PDF orientation',`<select id="report-orientation" class="control"><option value="portrait" ${!state.settings.reportLandscape?'selected':''}>Portrait</option><option value="landscape" ${state.settings.reportLandscape?'selected':''}>Landscape</option></select>`)}
  <div class="divider"></div><strong class="small">Include sections</strong>
  ${[['reportSummary','Summary figures'],['reportCharts','Spending breakdown'],...(purchases?[]:[['reportTable','Transaction table']]),['reportNotes','Footer notes']].map(([key,label])=>`<label class="switch-line"><input type="checkbox" data-setting="${key}" ${state.settings[key]?'checked':''}> ${label}</label>`).join('')}
  ${purchases?'<p class="small muted">The full itemized list is always included in purchases PDFs, even if other report options are disabled.</p>':''}
  <div class="divider"></div><div class="export-strip"><button class="btn btn-primary" data-action="exportPDF">${icon('download')} PDF</button><button class="btn" data-action="exportCSV">CSV</button><button class="btn" data-action="exportXLSX">Excel .xlsx</button></div>
- <p class="small muted">PDFs download offline. For Khmer letters, use “Print / Save as PDF” with a Khmer-capable browser font.</p>
+ <p class="small muted">Saved-data check: ${esc(savedExpenseNote)}. If a September purchase is missing, check Transactions → All time.</p><button type="button" class="btn btn-soft btn-sm" data-action="showAllSavedExpenses">${icon('transactions')} View all saved expense entries</button><p class="small muted">PDFs download offline. For Khmer letters, use “Print / Save as PDF” with a Khmer-capable browser font.</p>
  </div></section><section class="panel"><div class="panel-head"><div><h2>Live report preview</h2><p>${p.tx.length} entries to export · ${esc(p.cur)}</p></div></div>${preview}</section></div>`;
 }
 function spentFromTx(tx){const map=new Map();for(const t of tx){if(t.type==='expense')map.set(t.categoryId,(map.get(t.categoryId)||0)+usdOf(t));}return [...map].map(([id,amount])=>({id,amount})).sort((a,b)=>b.amount-a.amount);}
@@ -549,6 +553,7 @@ async function clickAction(action,id){switch(action){
  case 'exportXLSX':if(applyReportDates(false))exportXLSX();break;
  case 'exportPDF':if(applyReportDates(false))pdfExport();break;
  case 'applyReportDates':applyReportDates(true);break;
+ case 'showAllSavedExpenses':filters.period='all';filters.type='expense';filters.category='all';filters.method='all';filters.search='';navigate('transactions');break;
  case 'allPurchasesPDF':pdfExport(allPurchaseReportPayload());break;
  case 'printReport':if(applyReportDates(false)){if(page==='reports')renderReports();window.print();}break;
  case 'analyticsReport':report.period=analyticPeriod;if(analyticPeriod==='custom'){report.from=analyticsFrom;report.to=analyticsTo;}page='reports';render();break;
