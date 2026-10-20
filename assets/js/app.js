@@ -472,22 +472,24 @@ function pdfDate(s){if(!s)return'—';const [y,m,d]=s.split('-').map(Number);ret
 /* Khmer PDF downloads use browser-rendered Khmer glyphs rather than legacy Helvetica. */
 async function downloadReportPDF(overridePayload=null){
  const payload=overridePayload||reportPayload(),mode=payload.mode||report.mode||'purchases';
+ const language=state.settings.language==='km'?'km':'en';
  const containsKhmer=/[\u1780-\u17ff\u19e0-\u19ff]/;
  const exportItems=(mode==='budget'||mode==='savings')?state.transactions.filter(t=>t.type==='expense'):payload.tx;
  const hasKhmerEntries=exportItems.some(t=>[t.description,t.notes,t.method,...(t.tags||[]),categoryName(t.categoryId)].some(v=>containsKhmer.test(String(v||''))))||
    state.budgets.some(b=>containsKhmer.test(b.name||''))||
    state.goals.some(g=>containsKhmer.test(g.name||''))||
-   containsKhmer.test(payload.title||'');
+   containsKhmer.test(payload.title||'')||
+   containsKhmer.test(state.settings.name||'');
  // Also use the Khmer-capable renderer for Khmer purchases entered while the UI is in English.
- if(state.settings.language!=='km'&&!hasKhmerEntries){pdfExport(overridePayload);return;}
+ if(language==='en'&&!hasKhmerEntries){pdfExport(overridePayload);return;}
  if(!window.PocketwiseKhmerPDF?.download)throw Error('Khmer PDF support has not loaded. Reopen or refresh Pocketwise.');
  const balance=reportBalances(payload);
- const translate=value=>window.PocketwiseI18n?.translateString(String(value||''),'km')||String(value||'');
+ const translate=value=>language==='km'?(window.PocketwiseI18n?.translateString(String(value||''),'km')||String(value||'')):String(value||'');
  const allExpenses=(mode==='budget'||mode==='savings')?allPurchaseReportPayload().tx:payload.tx;
  const data={
   title:translate(payload.title),
   brand:state.settings.name,
-  mode,landscape:!!state.settings.reportLandscape,
+  language,mode,landscape:!!state.settings.reportLandscape,
   currency:payload.cur,
   range:payload.rangeLabel?translate(payload.rangeLabel):reportPeriodLabel(payload.range),
   firstBalance:balance.first==null?'':formatMoney(balance.first,payload.cur),
@@ -504,7 +506,7 @@ async function downloadReportPDF(overridePayload=null){
   items:allExpenses.map(t=>({date:fmtDate(t.date),name:t.description||'',type:t.type,category:translate(categoryName(t.categoryId)),method:translate(t.method||''),price:(t.type==='expense'?'-':'+')+formatOriginal(t),notes:t.notes||'',tags:(t.tags||[]).join(', ')}))
  };
  const file=await window.PocketwiseKhmerPDF.download(data);
- downloadBlob(file,(overridePayload?'Pocketwise_All_Purchases_':'Pocketwise_Report_')+today()+'_KM.pdf');
+ downloadBlob(file,(overridePayload?'Pocketwise_All_Purchases_':'Pocketwise_Report_')+today()+'_'+language.toUpperCase()+'.pdf');
 }
 
 function pdfExport(overridePayload=null){const payload=overridePayload||reportPayload(),mode=payload.mode||report.mode||'finance',land=!!state.settings.reportLandscape,W=land?842:595,H=land?595:842,pad=38,bottom=47;const pagesData=[];let ops=[],y=H-40;const makePage=()=>{if(ops.length)pagesData.push(ops.join('\n'));ops=[];y=H-48;ops.push(`0.05 0.58 0.42 rg 0 ${H-11} ${W} 11 re f`);};
