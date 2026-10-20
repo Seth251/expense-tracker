@@ -468,13 +468,14 @@ function exportXLSX(){const tx=page==='reports'?reportTransactions():page==='tra
 function pdfAscii(s){return String(s??'').normalize('NFKD').replace(/\u20ac/g,'EUR').replace(/[—–−]/g,'-').replace(/[“”]/g,'"').replace(/[‘’]/g,"'").replace(/[^\x20-\x7E]/g,'?');}
 function pdfQuote(s){return pdfAscii(s).replace(/\\/g,'\\\\').replace(/\(/g,'\\(').replace(/\)/g,'\\)');}
 function pdfNum(n){return (Math.round(n*100)/100).toString();}
+function pdfDate(s){if(!s)return'—';const [y,m,d]=s.split('-').map(Number);return new Date(y,m-1,d).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});}
 function pdfExport(overridePayload=null){const payload=overridePayload||reportPayload(),mode=payload.mode||report.mode||'finance',land=!!state.settings.reportLandscape,W=land?842:595,H=land?595:842,pad=38,bottom=47;const pagesData=[];let ops=[],y=H-40;const makePage=()=>{if(ops.length)pagesData.push(ops.join('\n'));ops=[];y=H-48;ops.push(`0.05 0.58 0.42 rg 0 ${H-11} ${W} 11 re f`);};
  const text=(value,x,pos,size=10,bold=false,color='#243548')=>{const rgb=hexToRgb(color);ops.push(`${pdfNum(rgb[0])} ${pdfNum(rgb[1])} ${pdfNum(rgb[2])} rg BT /${bold?'F2':'F1'} ${size} Tf 1 0 0 1 ${pdfNum(x)} ${pdfNum(pos)} Tm (${pdfQuote(value)}) Tj ET`);};
  const box=(x,pos,w,h,color)=>{const c=hexToRgb(color);ops.push(`${c.map(pdfNum).join(' ')} rg ${pdfNum(x)} ${pdfNum(pos)} ${pdfNum(w)} ${pdfNum(h)} re f`);};
  const line=(x1,y1,x2,y2)=>{ops.push(`0.87 0.9 0.9 RG 0.65 w ${pdfNum(x1)} ${pdfNum(y1)} m ${pdfNum(x2)} ${pdfNum(y2)} l S`);};
  const pageBreak=(height=20)=>{if(y-height<bottom){makePage();text(payload.title,pad,y,12,true);y-=26;}};
  const width=W-2*pad;
- makePage();text(state.settings.name.toUpperCase(),pad,y,11,true,'#11845f');y-=25;text(payload.title,pad,y,21,true);y-=21;text(`${payload.rangeLabel||fmtDate(payload.range.from)+' - '+fmtDate(payload.range.to)}  |  ${payload.cur}  |  Generated ${fmtDate(today())}`,pad,y,9,false,'#687987');y-=28;
+ makePage();text(state.settings.name.toUpperCase(),pad,y,11,true,'#11845f');y-=25;text(payload.title,pad,y,21,true);y-=21;text(`${payload.rangeLabel||pdfDate(payload.range.from)+' - '+pdfDate(payload.range.to)}  |  ${payload.cur}  |  Generated ${pdfDate(today())}`,pad,y,9,false,'#687987');y-=28;
  if(state.settings.reportSummary){const cols=mode==='purchases'?[['ITEMS BOUGHT',payload.tx.length],['TOTAL EXPENSES',payload.expenses],['SPENDING TOTAL',payload.expenses]]:[['INCOME',payload.income],['EXPENSES',payload.expenses],['NET CASH FLOW',payload.net]],cw=(width-16)/3;cols.forEach(([label,amt],i)=>{const x=pad+i*(cw+8);box(x,y-60,cw,64,'#f0f5f3');text(label,x+11,y-19,8,true,'#75857f');text(label==='ITEMS BOUGHT'?String(amt):pdfMoney(amt,payload.cur),x+11,y-45,14,true,'#153b2d');});y-=85;}
  const balances=reportBalances(payload);
  pageBreak(125);
@@ -497,7 +498,7 @@ function pdfExport(overridePayload=null){const payload=overridePayload||reportPa
  });
  y-=80;
  if(balances.budget){
-  const detail='Budget: '+balances.budget.name+(balances.budget.startDate?' | Money received: '+fmtDate(balances.budget.startDate):'');
+  const detail='Budget: '+balances.budget.name+(balances.budget.startDate?' | Money received: '+pdfDate(balances.budget.startDate):'');
   text(detail.slice(0,land?105:79),pad,y,8,false,'#687987');y-=15;
   text('Remaining = selected first balance - expenses in this report.',pad,y,8,false,'#687987');y-=18;
  }else{
