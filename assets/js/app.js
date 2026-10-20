@@ -438,7 +438,7 @@ function renderReports(){
  ${[['reportSummary','Summary figures'],['reportCharts','Spending breakdown'],...(purchases?[]:[['reportTable','Transaction table']]),['reportNotes','Footer notes']].map(([key,label])=>`<label class="switch-line"><input type="checkbox" data-setting="${key}" ${state.settings[key]?'checked':''}> ${label}</label>`).join('')}
  ${purchases?'<p class="small muted">The full itemized list is always included in purchases PDFs, even if other report options are disabled.</p>':''}
  <div class="divider"></div><div class="export-strip"><button class="btn btn-primary" data-action="exportPDF">${icon('download')} PDF</button><button class="btn" data-action="exportCSV">CSV</button><button class="btn" data-action="exportXLSX">Excel .xlsx</button></div>
- <p class="small muted">Saved-data check: ${esc(savedExpenseNote)}. If a September purchase is missing, check Transactions → All time.</p><button type="button" class="btn btn-soft btn-sm" data-action="showAllSavedExpenses">${icon('transactions')} View all saved expense entries</button><p class="small muted">The PDF download uses a Latin-only font. For Khmer text, choose “Print / Save as PDF” instead so your device can use a Khmer-capable font.</p>
+ <p class="small muted">Saved-data check: ${esc(savedExpenseNote)}. If a September purchase is missing, check Transactions → All time.</p><button type="button" class="btn btn-soft btn-sm" data-action="showAllSavedExpenses">${icon('transactions')} View all saved expense entries</button><p class="small muted">Khmer PDFs now download with readable Khmer letters. Khmer reports use image-based pages, so the words may not be selectable. For a text-selectable Khmer PDF, use “Print / Save as PDF” if your browser supports it.</p>
  </div></section><section class="panel"><div class="panel-head"><div><h2>Live report preview</h2><p>${p.tx.length} entries to export · ${esc(p.cur)}</p></div></div>${preview}</section></div>`;
 }
 function spentFromTx(tx){const map=new Map();for(const t of tx){if(t.type==='expense')map.set(t.categoryId,(map.get(t.categoryId)||0)+usdOf(t));}return [...map].map(([id,amount])=>({id,amount})).sort((a,b)=>b.amount-a.amount);}
@@ -483,8 +483,9 @@ async function downloadReportPDF(overridePayload=null){
   currency:payload.cur,
   range:payload.rangeLabel?translate(payload.rangeLabel):reportPeriodLabel(payload.range),
   firstBalance:balance.first==null?'':formatMoney(balance.first,payload.cur),
-  expenses:formatMoney(expensesOf(allExpenses),payload.cur),
-  remainingBalance:balance.first==null?'':formatMoney(balance.first-expensesOf(allExpenses),payload.cur),
+  expenses:formatMoney(payload.expenses,payload.cur),
+  itemListTotal:formatMoney(expensesOf(allExpenses),payload.cur),
+  remainingBalance:balance.remaining==null?'':formatMoney(balance.remaining,payload.cur),
   income:payload.income>0?formatMoney(payload.income,payload.cur):'',
   budgetName:balance.budget?.name||'',
   budgetDate:balance.budget?.startDate?fmtDate(balance.budget.startDate):'',
