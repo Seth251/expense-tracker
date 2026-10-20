@@ -23,7 +23,7 @@ const initialTemplates=[
  ['Coffee','transaction','month','Quick add your daily coffee.'],['Lunch','transaction','month','Quick add lunch spending.'],['Transportation','transaction','month','Quick add a ride or bus fare.']
 ].map(([name,kind,period,description],i)=>({id:'preset'+i,name,kind,period,description,amountMinor:i===8?150:i===9?300:i===10?200:0,currency:'USD',type:'expense',categoryId:i===8||i===9?'food':i===10?'transport':'',favorite:i>=8}));
 const defaultState=()=>({version:2,transactions:[],budgets:[],goals:[],contributions:[],recurring:[],templates:structuredClone(initialTemplates),categories:structuredClone(categoryDefaults),methods:['Cash','ABA Pay','ACLEDA','Credit Card','Bank Transfer','Other'],settings:{name:'Pocketwise',theme:'light',currency:'USD',rate:4100,accent:'#13a77c',dateFormat:'short',reportPeriod:'month',dashboardWidgets:['trend','categories','recent','budgets','quick'],labels:{balance:'Total balance',income:'Total income',expenses:'Total expenses',savings:'Savings balance'},reportTitle:'Financial Report',reportLandscape:false,reportCharts:true,reportNotes:true,reportSummary:true,reportTable:true}});
-let state=defaultState(), page='dashboard', db=null, persistPromise=Promise.resolve(), editing=null, filters={search:'',type:'all',category:'all',period:'month',sort:'newest',method:'all'}, analyticPeriod='month', analyticsFrom=monthNow()+'-01', analyticsTo=today(), report={period:'all',from:'',to:'',type:'expense',category:'all',mode:'purchases'}, dashboardMonth=monthNow();
+let state=defaultState(), page='dashboard', db=null, persistPromise=Promise.resolve(), editing=null, filters={search:'',type:'all',category:'all',period:'month',sort:'newest',method:'all'}, analyticPeriod='month', analyticsFrom=monthNow()+'-01', analyticsTo=today(), report={period:'all',from:'',to:'',type:'expense',category:'all',mode:'purchases',budgetId:'auto'}, dashboardMonth=monthNow();
 function toast(msg,error=false){const el=$('toast');el.textContent=msg;el.className='toast show'+(error?' error':'');clearTimeout(toast.timer);toast.timer=setTimeout(()=>el.className='toast',3500);}
 function safeLocalGet(){try{return JSON.parse(localStorage.getItem('pocketwise-v2')||'null');}catch{return null;}}
 function saveLocal(snapshot){try{localStorage.setItem('pocketwise-v2',JSON.stringify(snapshot));return true;}catch{return false;}}
@@ -362,6 +362,22 @@ function reportTransactions(){
  const r=reportRange(),purchases=report.mode==='purchases';
  return state.transactions.filter(t=>isIn(t.date,r)&&(purchases?t.type==='expense':(report.type==='all'||t.type===report.type))&&(report.category==='all'||t.categoryId===report.category)).sort((a,b)=>a.date.localeCompare(b.date)||String(a.created||'').localeCompare(String(b.created||'')));
 }
+
+function selectedReportBudget(){
+ // Prefer an all-expenses budget by default, never silently sum separate category budgets.
+ if(report.budgetId&&report.budgetId!=='auto'){
+  const chosen=state.budgets.find(b=>b.id===report.budgetId);
+  if(chosen)return chosen;
+ }
+ return state.budgets.find(b=>!b.categoryId)||state.budgets[0]||null;
+}
+function reportBalances(payload){
+ const budget=selectedReportBudget();
+ const first=budget?usdOf(budget):null;
+ // The first balance is the budget entered by the user (not a separate income transaction).
+ // The remaining balance subtracts the expenses displayed by this specific report.
+ return {budget,first,spent:payload.expenses,remaining:budget?first-payload.expenses:null};
+}
 function reportPayload(){
  const tx=reportTransactions(),r=reportRange(),income=incomeOf(tx),expenses=expensesOf(tx),mode=report.mode||'purchases';
  const title=mode==='purchases'&&(!state.settings.reportTitle||state.settings.reportTitle==='Financial Report')?'All Purchases & Expenses Report':(state.settings.reportTitle||'Financial Report');
@@ -372,18 +388,28 @@ function allPurchaseReportPayload(){
  const range=periodRange('all');return {tx,range,rangeLabel:'All dates',income:0,expenses:expensesOf(tx),net:-expensesOf(tx),title:'All Purchases & Expenses Report',cur:state.settings.currency,mode:'purchases'};
 }
 function renderReports(){
- const p=reportPayload(),mode=report.mode||'purchases',purchases=mode==='purchases';
+ const p=reportPayload(),mode=report.mode||'purchases',purchases=mode==='purchases',balance=reportBalances(p);
  const savedExpenseDates=state.transactions.filter(t=>t.type==='expense'&&validISODate(t.date)).map(t=>t.date).sort();
  const savedExpenseNote=savedExpenseDates.length
   ?String(savedExpenseDates.length)+' saved expenses on this device · '+fmtDate(savedExpenseDates[0])+' to '+fmtDate(savedExpenseDates[savedExpenseDates.length-1])
   :'No expense records saved on this device yet';
  const summary=purchases?`<div class="preview-summary"><div><small>ITEMS PURCHASED</small><strong>${p.tx.length}</strong></div><div><small>EXPENSE TOTAL</small><strong class="negative">${formatMoney(p.expenses)}</strong></div><div><small>REPORT CURRENCY</small><strong>${esc(p.cur)}</strong></div></div>`:
  `<div class="preview-summary"><div><small>TOTAL INCOME</small><strong class="positive">${formatMoney(p.income)}</strong></div><div><small>TOTAL EXPENSES</small><strong class="negative">${formatMoney(p.expenses)}</strong></div><div><small>NET CASH FLOW</small><strong>${formatMoney(p.net)}</strong></div></div>`;
+ const balanceSummary=balance.budget?
+ `<h3 class="small" style="margin:18px 0 8px">Budget balance calculation</h3>
+ <div class="preview-summary balance-summary">
+  <div><small>FIRST BALANCE</small><strong>${formatMoney(balance.first)}</strong></div>
+  <div><small>EXPENSES IN REPORT</small><strong class="negative">− ${formatMoney(balance.spent)}</strong></div>
+  <div><small>REMAINING BALANCE</small><strong class="${balance.remaining<0?'negative':'positive'}">${formatMoney(balance.remaining)}</strong></div>
+ </div>
+ <p class="preview-note">First balance from "${esc(balance.budget.name)}"${balance.budget.startDate?' · money date '+esc(fmtDate(balance.budget.startDate)):''}. Remaining = first balance minus expenses in this report period. Income is not added twice.</p>`:
+ `<div class="preview-summary balance-summary"><div><small>FIRST BALANCE</small><strong>Not set</strong></div><div><small>EXPENSES IN REPORT</small><strong class="negative">− ${formatMoney(p.expenses)}</strong></div><div><small>REMAINING BALANCE</small><strong>Not available</strong></div></div>
+ <p class="preview-note">Add a budget to calculate your first and remaining balances. No starting amount is assumed.</p>`;
  const extraPreview=mode==='budget'?`<h3 class="small">Budget performance</h3>${state.budgets.length?state.budgets.map(b=>{const u=budgetUsage(b);return `<div class="budget-line"><div class="budget-info"><strong>${esc(b.name)}</strong><div class="progress mini-progress"><span style="width:${clamp(u.percent,0,100)}%"></span></div></div><strong>${formatMoney(u.spent)} / ${formatMoney(u.limit)}</strong></div>`;}).join(''):empty('wallet','No budgets','Create budgets to include them in this report.')}`:
  mode==='savings'?`<h3 class="small">Savings goal performance</h3>${state.goals.length?state.goals.map(g=>{const amount=goalsSaved(g.id),target=toUSD(g.targetMinor,g.currency);return `<div class="budget-line"><div class="budget-info"><strong>${esc(g.emoji)} ${esc(g.name)}</strong><div class="progress mini-progress"><span style="width:${clamp(percentage(amount,target),0,100)}%"></span></div></div><strong>${formatMoney(amount)} / ${formatMoney(target)}</strong></div>`;}).join(''):empty('goal','No goals','Create savings goals to include them in this report.')}`:'';
  const showTable=purchases||(mode==='finance'&&state.settings.reportTable);
  const tableHtml=showTable?`<h3 class="small" style="margin:20px 0 8px">${purchases?'Every purchased item':'Transaction details'} (${p.tx.length})</h3>${p.tx.length?`<div class="table-wrap"><table class="preview-table"><thead><tr><th>Date</th><th>Item name / Description</th><th>Category</th><th>Payment</th><th>Original price</th></tr></thead><tbody>${p.tx.slice(0,150).map(t=>`<tr><td>${esc(t.date)}</td><td><strong>${esc(t.description||'Unnamed item')}</strong>${t.type==='income'?'<div class="small muted">Income</div>':''}${t.notes?`<div class="small muted">Notes: ${esc(t.notes)}</div>`:''}${Array.isArray(t.tags)&&t.tags.length?`<div class="small muted">Tags: ${esc(t.tags.join(', '))}</div>`:''}</td><td>${esc(categoryName(t.categoryId))}</td><td>${esc(t.method||'—')}</td><td style="text-align:right;white-space:nowrap">${t.type==='expense'?'−':'+'}${esc(formatOriginal(t))}</td></tr>`).join('')}</tbody></table>${p.tx.length>150?'<p class="preview-note">Preview shows the first 150 entries. The PDF includes every matching item, including notes and tags.</p>':''}</div>`:'<p class="preview-note">No matching expenses yet. Record a purchase to include it in the report.</p>'}`:'';
- const preview=`<div class="report-preview" id="report-preview"><div class="preview-top"><div class="eyebrow">${esc(state.settings.name.toUpperCase())} · ${purchases?'ITEMIZED PURCHASE REPORT':'FINANCIAL SUMMARY'}</div><h2>${esc(p.title)}</h2><div class="small muted">${esc(p.rangeLabel)} · ${esc(p.cur)} · Generated ${esc(fmtDate(today()))}</div></div>${state.settings.reportSummary?summary:''}${extraPreview}${(mode==='finance'||purchases)&&state.settings.reportCharts?`<h3 class="small" style="margin:18px 0 8px">Spending by category</h3>${donutChart(spentFromTx(p.tx))}`:''}${tableHtml}<div class="preview-note">Every expense is an individual row. Item prices show their original currency; summary totals use your selected display currency. ${state.settings.reportNotes?'Savings transfers are excluded from income and expenses.':''}</div></div>`;
+ const preview=`<div class="report-preview" id="report-preview"><div class="preview-top"><div class="eyebrow">${esc(state.settings.name.toUpperCase())} · ${purchases?'ITEMIZED PURCHASE REPORT':'FINANCIAL SUMMARY'}</div><h2>${esc(p.title)}</h2><div class="small muted">${esc(p.rangeLabel)} · ${esc(p.cur)} · Generated ${esc(fmtDate(today()))}</div></div>${state.settings.reportSummary?summary:''}${balanceSummary}${extraPreview}${(mode==='finance'||purchases)&&state.settings.reportCharts?`<h3 class="small" style="margin:18px 0 8px">Spending by category</h3>${donutChart(spentFromTx(p.tx))}`:''}${tableHtml}<div class="preview-note">Every expense is an individual row. Item prices show their original currency; summary totals use your selected display currency. ${state.settings.reportNotes?'Savings transfers are excluded from income and expenses.':''}</div></div>`;
  $('main').innerHTML=pageHead('SHARE & SAVE','Reports','Download a complete itemized list of everything you bought, including the name, date and price.',`<button class="btn btn-soft" data-action="printReport">${icon('file')} Print / Save as PDF</button><button class="btn btn-soft" data-action="allPurchasesPDF">${icon('download')} All purchases PDF</button><button class="btn btn-primary" data-action="exportPDF">${icon('download')} Download current PDF</button>`)+
  `<div class="grid wide-grid"><section class="panel report-controls"><div class="panel-head"><h2>Report builder</h2></div><div class="report-settings">
  ${field('Report content',`<select class="control" id="report-mode"><option value="purchases" ${purchases?'selected':''}>All purchases & expenses (itemized)</option><option value="finance" ${mode==='finance'?'selected':''}>Income & expense report</option><option value="budget" ${mode==='budget'?'selected':''}>Budget performance</option><option value="savings" ${mode==='savings'?'selected':''}>Savings goals</option></select>`)}
@@ -392,7 +418,9 @@ function renderReports(){
  ${report.period==='custom'?`<div class="fields-grid">${field('From — first purchase date included',txtInput('report-from',report.from||reportInitialFrom(),'',true,'date'))}${field('To — last purchase date included',txtInput('report-to',report.to||today(),'',true,'date'))}</div><button type="button" class="btn btn-primary btn-sm" data-action="applyReportDates">${icon('check')} Apply date range</button><p class="small muted" id="report-custom-status" style="margin:8px 0 0">Both dates are included. After picking the dates, tap Apply date range to refresh the preview and download exactly that period.</p>`:''}
  ${!purchases?field('Transaction type',`<select class="control" id="report-type"><option value="all" ${report.type==='all'?'selected':''}>All transactions</option><option value="expense" ${report.type==='expense'?'selected':''}>Expenses only</option><option value="income" ${report.type==='income'?'selected':''}>Income only</option></select>`):'<p class="small muted">This report includes every recorded expense, not income or savings transfers. A budget date is not the same as a purchase date.</p>'}
  ${field('Category',`<select class="control" id="report-category">${catOptions('all',report.category,true)}</select>`)}
- ${field('PDF orientation',`<select id="report-orientation" class="control"><option value="portrait" ${!state.settings.reportLandscape?'selected':''}>Portrait</option><option value="landscape" ${state.settings.reportLandscape?'selected':''}>Landscape</option></select>`)}
+ ${field('First balance from budget',`<select class="control" id="report-budget"><option value="auto" ${report.budgetId==='auto'?'selected':''}>${state.budgets.length?'Primary budget (automatic)':'No budgets saved yet'}</option>${state.budgets.map(b=>`<option value="${esc(b.id)}" ${report.budgetId===b.id?'selected':''}>${esc(b.name)} · ${esc(formatOriginal(b))}${b.startDate?' · '+esc(fmtDate(b.startDate)):''}</option>`).join('')}</select>`)}
+ <p class="small muted">First balance is the selected budget amount. Remaining balance subtracts expenses included by the report date/category filters. This does not change any saved budget or expense.</p>
+  ${field('PDF orientation',`<select id="report-orientation" class="control"><option value="portrait" ${!state.settings.reportLandscape?'selected':''}>Portrait</option><option value="landscape" ${state.settings.reportLandscape?'selected':''}>Landscape</option></select>`)}
  <div class="divider"></div><strong class="small">Include sections</strong>
  ${[['reportSummary','Summary figures'],['reportCharts','Spending breakdown'],...(purchases?[]:[['reportTable','Transaction table']]),['reportNotes','Footer notes']].map(([key,label])=>`<label class="switch-line"><input type="checkbox" data-setting="${key}" ${state.settings[key]?'checked':''}> ${label}</label>`).join('')}
  ${purchases?'<p class="small muted">The full itemized list is always included in purchases PDFs, even if other report options are disabled.</p>':''}
@@ -578,7 +606,7 @@ function handleChange(e){const target=e.target,id=target.id;
   if(status)status.textContent='Dates changed — tap Apply date range to refresh the results.';
   return;
  }
- const reportFields={'report-mode':'mode','report-period':'period','report-type':'type','report-category':'category'};
+ const reportFields={'report-mode':'mode','report-period':'period','report-type':'type','report-category':'category','report-budget':'budgetId'};
  if(reportFields[id]){
   report[reportFields[id]]=target.value;
   if(id==='report-period'&&report.period==='custom'){
