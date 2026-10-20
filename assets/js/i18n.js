@@ -446,7 +446,35 @@
   "Income and expenses": "ចំណូល និងចំណាយ",
   "Available to spend": "ប្រាក់អាចចំណាយបាន",
   "The PDF download uses a Latin-only font. For Khmer text, choose “Print / Save as PDF” instead so your device can use a Khmer-capable font.": "ការទាញយក PDF ធម្មតាប្រើពុម្ពអក្សរឡាតាំងតែប៉ុណ្ណោះ។ ប្រសិនបើចង់បង្ហាញអក្សរខ្មែរ សូមជ្រើស «បោះពុម្ព / រក្សាទុកជា PDF» ដើម្បីប្រើពុម្ពអក្សរខ្មែរពីឧបករណ៍។",
-  "Change the display language without changing your saved financial data.": "ប្តូរភាសាបង្ហាញដោយមិនប៉ះពាល់ដល់ទិន្នន័យហិរញ្ញវត្ថុដែលបានរក្សាទុក។"
+  "Change the display language without changing your saved financial data.": "ប្តូរភាសាបង្ហាញដោយមិនប៉ះពាល់ដល់ទិន្នន័យហិរញ្ញវត្ថុដែលបានរក្សាទុក។",
+  "Each budget card subtracts all matching expenses. The summary counts each expense once, even if multiple budgets cover the same category. Your money-received date does not filter or reset any spending.": "កាតថវិកានីមួយៗដកចំណាយដែលត្រូវនឹងលក្ខខណ្ឌ។ សេចក្តីសង្ខេបរាប់ចំណាយនីមួយៗតែម្តង ទោះបីមានថវិកាច្រើនសម្រាប់ប្រភេទដូចគ្នាក៏ដោយ។ ថ្ងៃទទួលប្រាក់មិនប៉ះពាល់ដល់ការគណនាចំណាយទេ។",
+  "Good morning 👋": "អរុណសួស្តី 👋",
+  "Good afternoon 👋": "ទិវាសួស្តី 👋",
+  "Good evening 👋": "សាយណ្ហសួស្តី 👋",
+  "Current budget periods": "រយៈពេលថវិកាបច្ចុប្បន្ន",
+  "Across all goals": "គ្រប់គោលដៅ",
+  "Combined target": "គោលដៅសរុប",
+  "Until you reach your goals": "រហូតដល់សម្រេចគោលដៅ",
+  "Goals in progress": "គោលដៅកំពុងដំណើរការ",
+  "Charts will appear when you record transactions.": "ក្រាហ្វនឹងបង្ហាញនៅពេលអ្នកកត់ត្រាប្រតិបត្តិការ។",
+  "No transactions found": "រកមិនឃើញប្រតិបត្តិការ",
+  "Add an expense to see your chart.": "បន្ថែមចំណាយដើម្បីមើលក្រាហ្វ។",
+  "Private financial report · Generated on your device · Transfers to savings are excluded from income and expenses.": "របាយការណ៍ហិរញ្ញវត្ថុឯកជន · បង្កើតលើឧបករណ៍របស់អ្នក · ការផ្ទេរទៅសន្សំមិនរាប់ជាចំណូល ឬចំណាយទេ។",
+  "Expenses by category": "ចំណាយតាមប្រភេទ",
+  "All recorded expenses (any date)": "ចំណាយដែលបានកត់ត្រាទាំងអស់ (គ្រប់ថ្ងៃ)",
+  "New transaction": "ប្រតិបត្តិការថ្មី",
+  "New expense": "ចំណាយថ្មី",
+  "Delete selected": "លុបដែលបានជ្រើស",
+  "All saved purchases": "ទំនិញដែលបានកត់ត្រាទាំងអស់",
+  "Report updated:": "បានអាប់ដេតរបាយការណ៍៖",
+  "Show all expenses": "បង្ហាញចំណាយទាំងអស់",
+  "Save as PDF": "រក្សាទុកជា PDF",
+  "Transaction details": "ព័ត៌មានលម្អិតប្រតិបត្តិការ",
+  "Transaction history": "ប្រវត្តិប្រតិបត្តិការ",
+  "Your monthly budget": "ថវិកាប្រចាំខែរបស់អ្នក",
+  "Update data": "ធ្វើបច្ចុប្បន្នភាពទិន្នន័យ",
+  "Select reporting period": "ជ្រើសរើសរយៈពេលរបាយការណ៍",
+  "Create budget to begin": "បង្កើតថវិកាដើម្បីចាប់ផ្តើម"
 };
   const originalText = new WeakMap();
   const appliedText = new WeakMap();
@@ -462,6 +490,7 @@
     if (Object.prototype.hasOwnProperty.call(words, key)) return before + words[key] + after;
     // Translate variable UI labels without touching amounts, dates, or item names.
     const rules = [
+      [/^(Good morning|Good afternoon|Good evening)(\\s*👋)?$/i, (text, greeting, emoji) => (words[greeting] || greeting) + (emoji || '')],
       [/^(\d+) transactions found$/i, '$1 ប្រតិបត្តិការត្រូវបានរកឃើញ'],
       [/^(\d+) transactions?$/i, '$1 ប្រតិបត្តិការ'],
       [/^(\d+) matching transactions$/i, '$1 ប្រតិបត្តិការត្រូវលក្ខខណ្ឌ'],
