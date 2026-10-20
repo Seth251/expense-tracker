@@ -484,7 +484,8 @@
   "Personal Finance Planner": "ផែនការហិរញ្ញវត្ថុផ្ទាល់ខ្លួន",
   "Savings Planner": "ផែនការសន្សំប្រាក់",
   "Subscription Tracker": "តាមដានសេវាប្រចាំខែ",
-  "Monthly Financial Report": "របាយការណ៍ហិរញ្ញវត្ថុប្រចាំខែ"
+  "Monthly Financial Report": "របាយការណ៍ហិរញ្ញវត្ថុប្រចាំខែ",
+  "Khmer PDFs now download with readable Khmer letters. Khmer reports use image-based pages, so the words may not be selectable. For a text-selectable Khmer PDF, use “Print / Save as PDF” if your browser supports it.": "ឥឡូវនេះការទាញយក PDF អាចបង្ហាញអក្សរខ្មែរបានត្រឹមត្រូវ។ ទំព័រ PDF ភាសាខ្មែរត្រូវបានបង្កើតជារូបភាព ដូច្នេះអាចនឹងមិនអាចជ្រើសរើសអត្ថបទបានទេ។ ប្រសិនបើចង់បាន PDF ដែលអាចជ្រើសរើសអក្សរបាន សូមប្រើ «បោះពុម្ព / រក្សាទុកជា PDF» ប្រសិនបើកម្មវិធីរុករកគាំទ្រ។"
 };
   const originalText = new WeakMap();
   const appliedText = new WeakMap();
