@@ -163,3 +163,11 @@ Khmer character detection is also applied when the interface is set to English: 
 The downloadable report now uses **English** for built-in headings and labels when the app is set to English, and **Khmer (ខ្មែរ)** when the app is set to Khmer. Switch languages with the header **ខ្មែរ / EN** control or **Settings → Language / ភាសា** before downloading. The exporter applies the selected language to the PDF title (when it matches a built-in title), balances, expense summary, category labels, section titles, page numbers, and footer. Original amounts and user-entered item names and notes remain unchanged.
 
 For English interface reports containing Khmer item names or notes, the app still uses the Khmer-glyph-safe PDF renderer so user-entered Khmer characters don't turn into question marks, but built-in PDF labels stay in English. Fully English reports continue using the original selectable-text PDF implementation. Khmer-language reports remain image-based to retain glyph shaping. Both styles work offline.
+
+
+## Report custom date-range validation fix
+
+The date-range picker formerly generated `name="report-from"` and `name="report-to"` but the Apply button searched for controls by `id`, which returned empty strings and rejected valid dates. The input fields now have matching IDs, and Apply also supports selecting them by name (including older cached markup). Native date inputs on iPhone are not re-rendered while the user is selecting dates.
+
+Both From and To dates are inclusive. For example, a custom range of 2026-09-14 through 2026-10-21 includes every matching expense from September and October within those boundaries. The preview, downloaded current PDF, CSV and Excel use the applied custom range. Genuine invalid or reversed ranges still show a warning. Saved transactions and budgets are not modified by changing report filters.
+
