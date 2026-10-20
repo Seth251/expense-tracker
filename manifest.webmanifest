@@ -1,0 +1,15 @@
+{
+  "id": "./",
+  "name": "Pocketwise — Expense Tracker",
+  "short_name": "Pocketwise",
+  "description": "Private offline-first income, expense and budget tracker",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#f6f8fb",
+  "theme_color": "#15a77a",
+  "icons": [
+    {"src":"./assets/icons/icon-192.png","sizes":"192x192","type":"image/png","purpose":"any maskable"},
+    {"src":"./assets/icons/icon-512.png","sizes":"512x512","type":"image/png","purpose":"any maskable"}
+  ]
+}
