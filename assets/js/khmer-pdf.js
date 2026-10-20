@@ -80,13 +80,13 @@
    const s=String(value??'').replace(/[\t\r\n]+/g,' ').trim();
    if(!s)return [];
    if(typeof Intl.Segmenter==='function'){
-    return Array.from(new Intl.Segmenter('km',{granularity:'word'}).segment(s),o=>o.segment);
+    return Array.from(new Intl.Segmenter(lang,{granularity:'word'}).segment(s),o=>o.segment);
    }
    return s.split(/(\s+)/u).filter(Boolean);
   }
   function splitLong(piece,maxWidth){
    if(ctx.measureText(piece).width<=maxWidth)return [piece];
-   const units=typeof Intl.Segmenter==='function'?Array.from(new Intl.Segmenter('km',{granularity:'grapheme'}).segment(piece),a=>a.segment):Array.from(piece);
+   const units=typeof Intl.Segmenter==='function'?Array.from(new Intl.Segmenter(lang,{granularity:'grapheme'}).segment(piece),a=>a.segment):Array.from(piece);
    const result=[];let current='';
    for(const unit of units){
     if(current&&ctx.measureText(current+unit).width>maxWidth){result.push(current);current=unit;}
