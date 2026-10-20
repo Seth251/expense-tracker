@@ -123,3 +123,10 @@ Open **Budgets → Add budget** and enter a budget amount and optional date you 
 Open **Reports** and select **All purchases & expenses (itemized)**. The default reporting period is **All time**, so every saved expense is listed separately, including items added together in the multi-item purchase form. The downloaded PDF includes the purchase date, full item name or transaction description, original price and currency, expense category, payment method, notes and tags when entered, and a total expense summary. Long item descriptions or notes wrap onto additional lines and long reports continue onto multiple pages. The report's expense total is converted into the display currency selected in Settings.
 
 For a PDF of absolutely **all purchases regardless of report filters**, click **All purchases PDF** on Reports or Transactions. Financial reports retain their optional date and type filters. Budget and savings PDFs include an all-purchases appendix. Reports are generated from saved entries on your device; no example data is inserted.
+
+## Custom report dates (September and later)
+
+On **Reports → Reporting period**, select **Custom range**. Pick **From** (for example 2026-09-14) and **To** (for example 2026-10-21), and tap **Apply date range**. Both boundary dates are included. The preview and **Download current PDF**, **CSV**, and **Excel** then use the same validated custom range. In iPhone Safari, a date picker is not refreshed while you are still selecting a date.
+
+An **All purchases PDF** button intentionally exports the complete expense history without applying the date filter. The Reports page now shows how many saved expenses exist on this device and the earliest/latest saved purchase dates. Use **View all saved expense entries** to open Transactions with **All time** and **Expenses** selected. If a September item is missing there, the report cannot retrieve it from another device or browser. The budget's money-received/start date does not itself create income or purchase records.
+
