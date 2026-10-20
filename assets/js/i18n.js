@@ -490,7 +490,7 @@
     if (Object.prototype.hasOwnProperty.call(words, key)) return before + words[key] + after;
     // Translate variable UI labels without touching amounts, dates, or item names.
     const rules = [
-      [/^(Good morning|Good afternoon|Good evening)(\\s*👋)?$/i, (text, greeting, emoji) => (words[greeting] || greeting) + (emoji || '')],
+      [/^(Good morning|Good afternoon|Good evening)(\s*👋)?$/i, (text, greeting, emoji) => (words[greeting] || greeting) + (emoji || '')],
       [/^(\d+) transactions found$/i, '$1 ប្រតិបត្តិការត្រូវបានរកឃើញ'],
       [/^(\d+) transactions?$/i, '$1 ប្រតិបត្តិការ'],
       [/^(\d+) matching transactions$/i, '$1 ប្រតិបត្តិការត្រូវលក្ខខណ្ឌ'],
