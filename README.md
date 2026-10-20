@@ -130,3 +130,12 @@ On **Reports → Reporting period**, select **Custom range**. Pick **From** (for
 
 An **All purchases PDF** button intentionally exports the complete expense history without applying the date filter. The Reports page now shows how many saved expenses exist on this device and the earliest/latest saved purchase dates. Use **View all saved expense entries** to open Transactions with **All time** and **Expenses** selected. If a September item is missing there, the report cannot retrieve it from another device or browser. The budget's money-received/start date does not itself create income or purchase records.
 
+
+
+## First balance and remaining balance in reports
+
+The **Reports** page now shows **First Balance**, **Expenses in Report**, and **Remaining Balance**, both in the on-screen preview and downloaded PDFs. Choose **First balance from budget** to select one of your saved budgets (automatically chooses an all-expenses budget where possible); selecting a budget does not create or modify income or expense transactions.
+
+**First Balance** = amount entered for that saved budget. **Expenses in Report** = expenses included by the currently selected reporting period and category filters (for example Sep 14 through Oct 21, inclusive). **Remaining Balance** = First Balance − Expenses in Report. For the unfiltered **All purchases PDF**, expenses cover all saved purchase dates. Income is not added twice. If no budget exists, First Balance and Remaining Balance are shown as unavailable, instead of assuming zero. A budget's money-received/start date is displayed for reference and is not an expense filter.
+
+Examples: First Balance USD 500; itemized expenses USD 125; Remaining Balance USD 375. These values are converted into the preferred report currency, with original purchase currencies retained in the item list.
